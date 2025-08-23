@@ -1,0 +1,65 @@
+{
+  "name": "@livelifelively/context-engine-mcp",
+  "version": "1.0.0",
+  "description": "ContextEngine MCP Server - Up-to-date documentation and code examples for any library",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "build": "tsc && chmod 755 dist/index.js",
+    "format": "prettier --write .",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
+    "lint:check": "eslint \"**/*.{js,ts,tsx}\"",
+    "start": "node dist/index.js --transport http",
+    "dev": "tsx src/index.ts --transport http --port 3000",
+    "pack-dxt": "echo 'DXT packaging removed - use local deployment instead'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/livelifelively/context-engine-mcp.git"
+  },
+  "keywords": [
+    "modelcontextprotocol",
+    "mcp",
+    "context-engine",
+    "documentation",
+    "api"
+  ],
+  "author": "Ashish Rana",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "context-engine-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "bugs": {
+    "url": "https://github.com/livelifelively/context-engine-mcp/issues"
+  },
+  "homepage": "https://github.com/livelifelively/context-engine-mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.2",
+    "commander": "^14.0.0",
+    "undici": "^6.6.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@types/node": "^22.13.14",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.5",
+    "msw": "^2.10.5",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0",
+    "vitest": "^3.2.4"
+  }
+}
