@@ -1,0 +1,25 @@
+{
+  "health": {
+    "success": {
+      "status": "healthy",
+      "timestamp": "2024-01-01T00:00:00Z",
+      "version": "1.0.0"
+    },
+    "error": {
+      "error": "Service unavailable",
+      "status": "unhealthy"
+    }
+  },
+  "greet": {
+    "success": "Hello! API is working correctly.",
+    "withName": "Hello, Alice! API is working correctly.",
+    "error": "Greeting service unavailable"
+  },
+  "errors": {
+    "network": "Network error occurred",
+    "timeout": "Request timeout",
+    "unauthorized": "Unauthorized. Please check your API key.",
+    "notFound": "The library you are trying to access does not exist. Please try with a different library ID.",
+    "rateLimit": "Rate limited due to too many requests. Please try again later."
+  }
+}
