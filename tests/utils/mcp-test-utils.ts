@@ -2,6 +2,7 @@ import { expect } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { join } from 'path';
+import { getTestConfig, shouldUseRealApi } from '../config/test-config.js';
 
 /**
  * MCP Test Utilities for integration testing
@@ -12,6 +13,7 @@ import { join } from 'path';
 export class MCPTestUtils {
   static client: Client;
   static isConnected = false;
+  static config = getTestConfig();
 
   /**
    * Sets up the MCP client and connects to the server
@@ -81,9 +83,10 @@ export class MCPTestUtils {
   /**
    * Validates a tool result and returns the parsed content
    * @param result - The result from a tool call
+   * @param expectedContent - Optional expected content to validate
    * @returns Object containing content array and first content item
    */
-  static validateToolResult(result: any) {
+  static validateToolResult(result: any, expectedContent?: string) {
     expect(result).toBeDefined();
     expect(result.content).toBeDefined();
     const content = result.content as any[];
@@ -93,6 +96,17 @@ export class MCPTestUtils {
     const firstContent = content[0] as any;
     expect(firstContent.type).toBe('text');
     expect(typeof firstContent.text).toBe('string');
+    
+    // Content validation
+    if (expectedContent) {
+      expect(firstContent.text).toContain(expectedContent);
+    }
+    
+    // Validate it's not an error message (for real API tests)
+    if (shouldUseRealApi()) {
+      expect(firstContent.text).not.toContain('Failed to send greeting');
+      expect(firstContent.text).not.toContain('library you are trying to access does not exist');
+    }
     
     return { content, firstContent };
   }
@@ -106,6 +120,18 @@ export class MCPTestUtils {
   static async callToolAndValidate(name: string, args: any = {}) {
     const result = await this.client.callTool({ name, arguments: args });
     return this.validateToolResult(result);
+  }
+
+  /**
+   * Calls a tool and validates the result with expected content
+   * @param name - Tool name to call
+   * @param args - Arguments to pass to the tool
+   * @param expectedContent - Expected content to validate
+   * @returns Validated result object
+   */
+  static async callToolAndValidateContent(name: string, args: any = {}, expectedContent?: string) {
+    const result = await this.client.callTool({ name, arguments: args });
+    return this.validateToolResult(result, expectedContent);
   }
 
   /**
@@ -126,14 +152,27 @@ export class MCPTestUtils {
   }
 
   /**
-   * Creates a StdioClientTransport for testing
+   * Creates a StdioClientTransport for testing with configured arguments
    * @returns Configured StdioClientTransport instance
    */
   static createTransport() {
     const serverPath = join(process.cwd(), 'dist', 'index.js');
+    const args = [
+      serverPath, 
+      '--transport', 'stdio',
+      '--server-url', this.config.apiBaseUrl
+    ];
+
+    // Add API key if configured
+    if (this.config.apiKey) {
+      args.push('--api-key', this.config.apiKey);
+    }
+
+    console.log(`MCP Test Utils: Starting server with args: ${args.join(' ')}`);
+    
     return new StdioClientTransport({
       command: 'node',
-      args: [serverPath, '--transport', 'stdio']
+      args: args
     });
   }
 
@@ -179,6 +218,42 @@ export class MCPTestUtils {
       expect(typeof tool.name).toBe('string');
       expect(typeof tool.description).toBe('string');
       expect(typeof tool.inputSchema).toBe('object');
+    }
+  }
+
+  /**
+   * Tests actual API connectivity
+   * @returns Object with connectivity status
+   */
+  static async testApiConnectivity() {
+    try {
+      const response = await fetch(`${this.config.apiBaseUrl}/api/v1/greet`);
+      return {
+        success: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        url: this.config.apiBaseUrl
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message,
+        url: this.config.apiBaseUrl
+      };
+    }
+  }
+
+  /**
+   * Validates specific error messages
+   * @param error - The error object
+   * @param expectedErrorPattern - Expected error pattern to match
+   */
+  static validateErrorContent(error: any, expectedErrorPattern: string) {
+    expect(error).toBeDefined();
+    expect(error.message || error.code).toBeDefined();
+    
+    if (error.message) {
+      expect(error.message).toContain(expectedErrorPattern);
     }
   }
 }

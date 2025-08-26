@@ -91,3 +91,26 @@ export function handlePreflightRequest(res: ServerResponse): void {
   res.writeHead(200);
   res.end();
 }
+
+/**
+ * Validates API key based on server environment
+ * @param apiKey The API key to validate
+ * @param serverUrl The server URL to determine environment
+ * @returns void - throws error if validation fails
+ */
+export function validateApiKey(apiKey: string | undefined, serverUrl?: string): void {
+  const isLocalServer = serverUrl && serverUrl.includes('localhost');
+  
+  if (isLocalServer) {
+    console.log(`Using local server: ${serverUrl}`);
+    // For local server, allow test API keys or skip validation
+    if (!apiKey || apiKey === 'local') {
+      console.log('Using test API key for local development');
+    }
+  } else {
+    // Validate API key for production
+    if (!apiKey) {
+      throw new Error("API key is required for production use");
+    }
+  }
+}
