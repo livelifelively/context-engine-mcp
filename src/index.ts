@@ -3,7 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { greet } from "./lib/api.js";
+import { startContextEngine } from "./lib/api.js";
 import { createServer } from "http";
 import { IncomingMessage, ServerResponse } from "http";
 import {
@@ -71,34 +71,32 @@ function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: st
       version: "1.0.13",
     },
     {
-      instructions:
-        "Use this server to send greetings.",
+      instructions: "Use this server to start the context engine.",
     }
   );
 
 
 
-  // Register greet tool
+
+
   server.registerTool(
-    "greet",
+    "start_context_engine",
     {
-      title: "Send Greeting",
-      description: "Sends a personalized greeting message to test API connectivity.",
-      inputSchema: {
-        name: z.string().optional()
-      },
+      title: "Start Context Engine",
+      description: "Starts the context engine and returns a confirmation message.",
+      inputSchema: {},
     },
-    async ({ name }) => {
+    async () => {
       // Validate API key based on environment
       validateApiKey(apiKey, finalServerUrl);
       
-      const greetingResponse = await greet(name, clientIp, apiKey, finalServerUrl);
+      const startContextEngineResponse = await startContextEngine(clientIp, apiKey, finalServerUrl);
 
       return {
         content: [
           {
             type: "text",
-            text: greetingResponse,
+            text: startContextEngineResponse,
           },
         ],
       };

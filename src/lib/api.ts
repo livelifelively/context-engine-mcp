@@ -79,36 +79,31 @@ async function makeApiRequest(
 }
 
 /**
- * Greet function to test basic API connectivity with a personalized message
- * @param name Optional name to include in the greeting
+ * Start context engine function to initiate the context engine service
  * @param clientIp Optional client IP address to include in headers
  * @param apiKey Optional API key for authentication
  * @param serverUrl Optional server URL override
- * @returns Greeting message or error message
+ * @returns Start confirmation message or error message
  */
-export async function greet(
-  name?: string,
+export async function startContextEngine(
   clientIp?: string,
   apiKey?: string,
   serverUrl?: string
 ): Promise<string> {
   try {
-    const params: Record<string, string> = {};
-    if (name) params.name = name;
-    
-    const url = buildApiUrl("greet", params, serverUrl);
+    const url = buildApiUrl("start-context-engine", {}, serverUrl);
     const headers = generateHeaders(clientIp, apiKey, { "X-ContextEngine-Source": "mcp-server" });
     
-    const response = await makeApiRequest(url, headers, "send greeting");
+    const response = await makeApiRequest(url, headers, "start context engine");
     const text = await response.text();
     
     if (!text || text === "No content available") {
-      return "Hello! API is working but no greeting content available.";
+      return "Context engine start request sent but no confirmation available.";
     }
     
     return text;
   } catch (error) {
-    console.error("Greeting API call failed:", error);
-    throw new Error(`Failed to send greeting: ${error}`);
+    console.error("Start context engine API call failed:", error);
+    throw new Error(`Failed to start context engine: ${error}`);
   }
 }

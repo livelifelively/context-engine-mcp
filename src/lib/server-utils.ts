@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
+import { logger } from "./logger.js";
 
 /**
  * Extracts client IP from request headers
@@ -102,10 +103,10 @@ export function validateApiKey(apiKey: string | undefined, serverUrl?: string): 
   const isLocalServer = serverUrl && serverUrl.includes('localhost');
   
   if (isLocalServer) {
-    console.log(`Using local server: ${serverUrl}`);
+    logger.info(`Using local server: ${serverUrl}`);
     // For local server, allow test API keys or skip validation
     if (!apiKey || apiKey === 'local') {
-      console.log('Using test API key for local development');
+      logger.info('Using test API key for local development');
     }
   } else {
     // Validate API key for production

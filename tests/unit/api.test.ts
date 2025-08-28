@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { greet } from '../../src/lib/api.js';
+import { startContextEngine } from '../../src/lib/api.js';
 import apiResponses from '../fixtures/api-responses.json';
 import { getTestConfig, shouldUseRealApi } from '../config/test-config.js';
 
@@ -26,42 +26,11 @@ describe('API Functions', () => {
 
 
 
-  describe('greet', () => {
-    // it('should return greeting message on successful API call', async () => {
-    //   const mockResponse = apiResponses.greet.success;
-      
-    //   if (!shouldUseRealApi()) {
-    //     mockFetch.mockResolvedValueOnce({
-    //       ok: true,
-    //       text: async () => mockResponse,
-    //     });
-    //   }
 
-    //   const result = await greet(undefined, undefined, undefined, config.apiBaseUrl);
 
-    //   // Same expectations regardless of mock or real
-    //   expect(result).toBeDefined();
-    //   expect(typeof result).toBe('string');
-    //   expect(result).toContain('Hello');
-    //   expect(result).not.toContain('Failed to send greeting');
-      
-    //   if (!shouldUseRealApi()) {
-    //     // Additional mock-specific validations
-    //     expect(mockFetch).toHaveBeenCalledWith(
-    //       expect.any(URL),
-    //       {
-    //         headers: {
-    //           'X-ContextEngine-Source': 'mcp-server',
-    //         },
-    //       }
-    //     );
-    //     expect(mockFetch.mock.calls[0][0].toString()).toBe(`${config.apiBaseUrl}/api/greet`);
-    //   }
-    // });
-
-    it('should return greeting with name when provided', async () => {
-      const name = 'Alice';
-      const mockResponse = apiResponses.greet.withName;
+  describe('startContextEngine', () => {
+    it('should return success message on successful API call', async () => {
+      const mockResponse = apiResponses['start-context-engine'].success;
       
       if (!shouldUseRealApi()) {
         mockFetch.mockResolvedValueOnce({
@@ -70,14 +39,13 @@ describe('API Functions', () => {
         });
       }
 
-      const result = await greet(name, undefined, undefined, config.apiBaseUrl);
+      const result = await startContextEngine(undefined, undefined, config.apiBaseUrl);
 
       // Same expectations regardless of mock or real
       expect(result).toBeDefined();
       expect(typeof result).toBe('string');
-      expect(result).toContain('Hello');
-      expect(result).toContain(name);
-      expect(result).not.toContain('Failed to send greeting');
+      expect(result).toContain('Context engine started');
+      expect(result).not.toContain('Failed to start context engine');
       
       if (!shouldUseRealApi()) {
         // Additional mock-specific validations
@@ -89,128 +57,112 @@ describe('API Functions', () => {
             },
           }
         );
-        expect(mockFetch.mock.calls[0][0].toString()).toBe(`${config.apiBaseUrl}/api/greet?name=Alice`);
+        expect(mockFetch.mock.calls[0][0].toString()).toBe(`${config.apiBaseUrl}/api/start-context-engine`);
       }
     });
 
-    // it('should throw error on network failure', async () => {
-    //   if (shouldUseRealApi()) {
-    //     // Skip network failure test for real API - we can't control network
-    //     console.log('Skipping network failure test for real API');
-    //     return;
-    //   }
+    it('should return fallback message when API returns empty content', async () => {
+      if (shouldUseRealApi()) {
+        // Skip this test for real API - we can't control API responses
+        return;
+      }
       
-    //   mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: async () => 'No content available',
+      });
 
-    //   await expect(greet()).rejects.toThrow('Failed to send greeting: Error: Network error');
-    //   expect(mockFetch).toHaveBeenCalledTimes(1);
-    // });
+      const result = await startContextEngine();
 
-    // it('should throw error on API error response', async () => {
-    //   if (shouldUseRealApi()) {
-    //     // Skip API error test for real API - we can't control API responses
-    //     console.log('Skipping API error test for real API');
-    //     return;
-    //   }
+      expect(result).toBe('Context engine start request sent but no confirmation available.');
+    });
+
+    it('should throw error on network failure', async () => {
+      if (shouldUseRealApi()) {
+        // Skip network failure test for real API - we can't control network
+        return;
+      }
       
-    //   mockFetch.mockResolvedValueOnce({
-    //     ok: false,
-    //     status: 404,
-    //   });
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-    //   await expect(greet()).rejects.toThrow('Failed to send greeting: Error: The library you are trying to access does not exist. Please try with a different library ID.');
-    // });
+      await expect(startContextEngine()).rejects.toThrow('Failed to start context engine: Error: Network error');
+    });
 
-    // it('should return fallback message when API returns empty content', async () => {
-    //   if (shouldUseRealApi()) {
-    //     // Skip this test for real API - we can't control API responses
-    //     console.log('Skipping empty content test for real API');
-    //     return;
-    //   }
+    it('should throw error on API error response', async () => {
+      if (shouldUseRealApi()) {
+        // Skip API error test for real API - we can't control API responses
+        return;
+      }
       
-    //   mockFetch.mockResolvedValueOnce({
-    //     ok: true,
-    //     text: async () => 'No content available',
-    //   });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+      });
 
-    //   const result = await greet();
+      await expect(startContextEngine()).rejects.toThrow('Failed to start context engine: Error: Failed to start context engine. Please try again later. Error code: 500');
+    });
 
-    //   expect(result).toBe('Hello! API is working but no greeting content available.');
-    // });
-
-    // it('should return actual text when API returns "No context data available"', async () => {
-    //   if (shouldUseRealApi()) {
-    //     // Skip this test for real API - we can't control API responses
-    //     console.log('Skipping "No context data" test for real API');
-    //     return;
-    //   }
+    it('should use custom server URL when provided', async () => {
+      const customUrl = 'https://custom-api.example.com';
+      const mockResponse = apiResponses['start-context-engine'].success;
       
-    //   mockFetch.mockResolvedValueOnce({
-    //     ok: true,
-    //     text: async () => 'No context data available',
-    //   });
+      if (!shouldUseRealApi()) {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          text: async () => mockResponse,
+        });
+      }
 
-    //   const result = await greet();
+      const result = await startContextEngine(undefined, undefined, customUrl);
 
-    //   expect(result).toBe('No context data available');
-    // });
-
-    // it('should use custom server URL when provided', async () => {
-    //   const customUrl = 'https://custom-api.example.com';
-    //   const mockResponse = apiResponses.greet.success;
+      // Same expectations regardless of mock or real
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Context engine started');
+      expect(result).not.toContain('Failed to start context engine');
       
-    //   if (!shouldUseRealApi()) {
-    //     mockFetch.mockResolvedValueOnce({
-    //       ok: true,
-    //       text: async () => mockResponse,
-    //     });
-    //   }
+      if (!shouldUseRealApi()) {
+        // Additional mock-specific validations
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.any(URL),
+          {
+            headers: {
+              'X-ContextEngine-Source': 'mcp-server',
+            },
+          }
+        );
+        expect(mockFetch.mock.calls[0][0].toString()).toBe(`${customUrl}/api/start-context-engine`);
+      }
+    });
 
-    //   const result = await greet(undefined, undefined, undefined, customUrl);
-
-    //   // Same expectations regardless of mock or real
-    //   expect(result).toBeDefined();
-    //   expect(typeof result).toBe('string');
-    //   expect(result).toContain('Hello');
-    //   expect(result).not.toContain('Failed to send greeting');
+    it('should include client IP and API key in headers when provided', async () => {
+      if (shouldUseRealApi()) {
+        // Skip this test for real API - we can't control API responses
+        return;
+      }
       
-    //   if (!shouldUseRealApi()) {
-    //     // Additional mock-specific validations
-    //     expect(mockFetch).toHaveBeenCalledWith(
-    //       expect.any(URL),
-    //       {
-    //         headers: {
-    //           'X-ContextEngine-Source': 'mcp-server',
-    //         },
-    //       }
-    //     );
-    //     expect(mockFetch.mock.calls[0][0].toString()).toBe(`${customUrl}/api/greet`);
-    //   }
-    // });
-
-    // it('should include client IP and API key in headers when provided', async () => {
-    //   const mockResponse = apiResponses.greet.success;
-    //   const clientIp = '192.168.1.1';
-    //   const apiKey = 'test-api-key';
+      const mockResponse = apiResponses['start-context-engine'].success;
+      const clientIp = '192.168.1.1';
+      const apiKey = 'test-api-key';
       
-    //   mockFetch.mockResolvedValueOnce({
-    //     ok: true,
-    //     text: async () => mockResponse,
-    //   });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: async () => mockResponse,
+      });
 
-    //   await greet(undefined, clientIp, apiKey);
+      await startContextEngine(clientIp, apiKey);
 
-    //   expect(mockFetch).toHaveBeenCalledWith(
-    //     expect.any(URL),
-    //     {
-    //       headers: {
-    //         'Authorization': 'Bearer test-api-key',
-    //         'X-ContextEngine-Source': 'mcp-server',
-    //         'mcp-client-ip': expect.any(String),
-    //       },
-    //     }
-    //   );
-    //   expect(mockFetch.mock.calls[0][0].toString()).toBe('https://contextengine.in/api/v1/greet');
-    // });
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        {
+          headers: {
+            'Authorization': 'Bearer test-api-key',
+            'X-ContextEngine-Source': 'mcp-server',
+            'mcp-client-ip': expect.any(String),
+          },
+        }
+      );
+      expect(mockFetch.mock.calls[0][0].toString()).toBe('https://contextengine.in/api/start-context-engine');
+    });
   });
 });

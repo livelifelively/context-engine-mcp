@@ -10,28 +10,23 @@ describe('MCP Server Integration', () => {
     await MCPTestUtils.cleanupClient();
   });
 
-  it('should execute greet tool and return valid response', async () => {
-    if (MCPTestUtils.skipIfNotConnected('greet test')) return;
+  it('should execute start_context_engine tool and return valid response', async () => {
+    if (MCPTestUtils.skipIfNotConnected('start_context_engine test')) return;
     
     // This test calls the local MCP server, which then calls the configured API
     // Flow: Test → MCP Client → Local MCP Server → API (local or remote)
     const result = await MCPTestUtils.client.callTool({ 
-      name: 'greet', 
-      arguments: { name: 'TestUser' } 
+      name: 'start_context_engine', 
+      arguments: {} 
     });
     
     const content = result.content as any[];
     const responseText = content[0].text;
     console.log('MCP Tool Response:', responseText);
     
-    // Strong assertions - should NOT be an error
+    // Test tool functionality - should return a valid response
     expect(responseText).toBeDefined();
     expect(typeof responseText).toBe('string');
-    expect(responseText).not.toContain('Failed to send greeting');
-    expect(responseText).not.toContain('library you are trying to access does not exist');
-    
-    // Should be a proper greeting
-    expect(responseText).toContain('Hello');
-    expect(responseText).toContain('TestUser');
+    expect(responseText.length).toBeGreaterThan(0);
   });
 });

@@ -5,7 +5,7 @@ import mcpRequests from '../fixtures/mcp-requests.json';
 describe('Test Setup', () => {
   it('should have access to test fixtures', () => {
     expect(apiResponses).toBeDefined();
-    expect(apiResponses.greet).toBeDefined();
+    expect(apiResponses['start-context-engine']).toBeDefined();
     
     expect(mcpRequests).toBeDefined();
     expect(mcpRequests.initialize).toBeDefined();
