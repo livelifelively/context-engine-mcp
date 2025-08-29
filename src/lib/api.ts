@@ -81,22 +81,53 @@ async function makeApiRequest(
 }
 
 /**
- * Start context engine function to initiate the context engine service and setup local documentation structure
+ * Start context engine function to initiate the context engine service
+ * @param projectRoot Required project root directory
  * @param clientIp Optional client IP address to include in headers
  * @param apiKey Optional API key for authentication
  * @param serverUrl Optional server URL override
  * @returns Combined status message including API response and local setup status
  */
 export async function startContextEngine(
+  projectRoot: string,
   clientIp?: string,
   apiKey?: string,
   serverUrl?: string
 ): Promise<string> {
+  if (!projectRoot) {
+    throw new Error("Project root directory is required for context engine initialization");
+  }
+
   let apiResponse = "";
   let documentationStatus = "";
 
   try {
-    // Step 1: Start the context engine via API
+    // Step 1: Setup local documentation structure first
+    logger.info("Setting up local documentation structure");
+    const setupResult = await setupDocumentationStructure(projectRoot);
+
+    if (setupResult.success) {
+      documentationStatus = `\n\n📁 Local Documentation Structure: ${setupResult.message}`;
+      logger.info("Local documentation structure setup completed", {
+        status: setupResult.status as unknown as Record<string, unknown>,
+      });
+    } else {
+      logger.warn("Local documentation structure setup failed", {
+        status: setupResult.status as unknown as Record<string, unknown>,
+      });
+      // Don't proceed with API call if local setup fails
+      return `❌ Failed to setup local documentation structure: ${setupResult.message}`;
+    }
+  } catch (error) {
+    logger.error("Local documentation structure setup failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    // Don't proceed with API call if local setup fails
+    return `❌ Failed to setup local documentation structure: ${error instanceof Error ? error.message : String(error)}`;
+  }
+
+  try {
+    // Step 2: Start the context engine via API (only if local setup succeeded)
     logger.info("Starting ContextEngine via API");
     const url = buildApiUrl("start-context-engine", {}, serverUrl);
     const headers = generateHeaders(clientIp, apiKey, { "X-ContextEngine-Source": "mcp-server" });
@@ -115,29 +146,10 @@ export async function startContextEngine(
     logger.error("ContextEngine API call failed", {
       error: error instanceof Error ? error.message : String(error),
     });
-    throw new Error(`Failed to start context engine: ${error}`);
+
+    apiResponse = `⚠️  ContextEngine API call failed: ${error instanceof Error ? error.message : String(error)}`;
   }
-
-  try {
-    // Step 2: Setup local documentation structure
-    logger.info("Setting up local documentation structure");
-    const setupResult = await setupDocumentationStructure();
-
-    if (setupResult.success) {
-      documentationStatus = `\n\n📁 Local Documentation Structure: ${setupResult.message}`;
-      logger.info("Local documentation structure setup completed", { status: setupResult.status });
-    } else {
-      documentationStatus = `\n\n⚠️  Local Documentation Structure: ${setupResult.message}`;
-      logger.warn("Local documentation structure setup failed", { status: setupResult.status });
-    }
-  } catch (error) {
-    documentationStatus = `\n\n❌ Local Documentation Structure: Failed to setup - ${error instanceof Error ? error.message : String(error)}`;
-    logger.error("Local documentation structure setup failed", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-    // Don't throw here - we still want to return the API response even if local setup fails
-  }
-
+  
   // Return combined response
   return `${apiResponse}${documentationStatus}`;
 }

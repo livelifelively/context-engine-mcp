@@ -222,7 +222,7 @@ describe("Documentation Setup Module", () => {
       // Mock that everything exists
       mockFs.access.mockResolvedValue(undefined);
 
-      const result = await setupDocumentationStructure();
+      const result = await setupDocumentationStructure("/tmp/test-project");
 
       expect(result.success).toBe(true);
       expect(result.message).toBe("Documentation structure already exists and is complete");
@@ -253,7 +253,7 @@ describe("Documentation Setup Module", () => {
       mockFs.mkdir.mockResolvedValue(undefined);
       mockFs.writeFile.mockResolvedValue(undefined);
 
-      const result = await setupDocumentationStructure();
+      const result = await setupDocumentationStructure("/tmp/test-project");
 
       expect(result.success).toBe(true);
       expect(result.message).toBe("Documentation structure setup completed successfully");
@@ -266,7 +266,7 @@ describe("Documentation Setup Module", () => {
       mockFs.access.mockRejectedValue(new Error("ENOENT"));
       mockFs.mkdir.mockRejectedValue(new Error("Permission denied"));
 
-      const result = await setupDocumentationStructure();
+      const result = await setupDocumentationStructure("/tmp/test-project");
 
       expect(result.success).toBe(false);
       expect(result.message).toContain("Failed to setup documentation structure");

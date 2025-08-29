@@ -2,6 +2,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
 
 import { startContextEngine } from "./lib/api.js";
 import { createServer } from "http";
@@ -79,13 +80,20 @@ function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: st
     {
       title: "Start Context Engine",
       description: "Starts the context engine and returns a confirmation message.",
-      inputSchema: {},
+      inputSchema: {
+        projectRoot: z.string().describe("The project root directory"),
+      },
     },
-    async () => {
+    async (args) => {
       // Validate API key based on environment
       validateApiKey(apiKey, finalServerUrl);
 
-      const startContextEngineResponse = await startContextEngine(clientIp, apiKey, finalServerUrl);
+      const startContextEngineResponse = await startContextEngine(
+        args.projectRoot,
+        clientIp,
+        apiKey,
+        finalServerUrl
+      );
 
       return {
         content: [
