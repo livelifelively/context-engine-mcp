@@ -1,19 +1,34 @@
 {
-  "name": "@livelifelively/context-engine-mcp",
-  "version": "1.0.0",
+  "name": "context-engine",
+  "version": "0.1.0",
   "description": "ContextEngine MCP Server - Up-to-date documentation and code examples for any library",
   "scripts": {
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
+    "test:mock": "TEST_MODE=mock vitest run",
+    "test:real": "TEST_MODE=real vitest run",
+    "test:local": "TEST_MODE=real TEST_API_BASE_URL=http://localhost:3000 vitest run",
+    "test:staging": "TEST_MODE=real TEST_API_BASE_URL=https://staging.contextengine.in vitest run",
+    "test:prod": "TEST_MODE=real TEST_API_BASE_URL=https://contextengine.in vitest run",
+
+    "test:debug": "TEST_MODE=real TEST_TIMEOUT=30000 vitest run --reporter=verbose",
+    "test:watch:local": "TEST_MODE=real TEST_API_BASE_URL=http://localhost:3000 vitest --watch",
     "build": "tsc && chmod 755 dist/index.js",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "lint:check": "eslint \"**/*.{js,ts,tsx}\"",
+    "type-check": "tsc --noEmit",
     "start": "node dist/index.js --transport http",
     "dev": "tsx src/index.ts --transport http --port 3000",
-    "pack-dxt": "echo 'DXT packaging removed - use local deployment instead'"
+    "pack-dxt": "echo 'DXT packaging removed - use local deployment instead'",
+    "prepublishOnly": "npm run build && npm run test:run",
+    "pre-publish": "./scripts/pre-publish.sh",
+    "demote-to-rc": "./scripts/demote-to-rc.sh",
+    "version": "echo $npm_package_version"
   },
   "repository": {
     "type": "git",
@@ -30,7 +45,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "context-engine-mcp": "dist/index.js"
+    "context-engine": "dist/index.js"
   },
   "files": [
     "dist"
@@ -40,10 +55,10 @@
   },
   "homepage": "https://github.com/livelifelively/context-engine-mcp#readme",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.13.2",
+    "@modelcontextprotocol/sdk": "^1.16.0",
     "commander": "^14.0.0",
-    "undici": "^6.6.3",
-    "zod": "^3.24.2"
+    "undici": "^7.15.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",

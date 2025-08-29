@@ -3,7 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { checkHealth, greet } from "./lib/api.js";
+import { startContextEngine } from "./lib/api.js";
 import { createServer } from "http";
 import { IncomingMessage, ServerResponse } from "http";
 import {
@@ -12,6 +12,7 @@ import {
   setupCorsHeaders,
   sendErrorResponse,
   handlePreflightRequest,
+  validateApiKey,
 } from "./lib/server-utils.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
@@ -60,71 +61,42 @@ function validateCliOptions(options: CliOptions): void {
  * Creates a new server instance with all tools registered
  */
 function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: string) {
+  // Priority: CLI > ENV > MCP config > default
+  const finalServerUrl = serverUrl || 
+                        process.env.CONTEXT_ENGINE_SERVER_URL || 
+                        "https://contextengine.in";
   const server = new McpServer(
     {
       name: "ContextEngine",
       version: "1.0.13",
     },
     {
-      instructions:
-        "Use this server to check health status and send greetings.",
+      instructions: "Use this server to start the context engine.",
     }
   );
 
-  // Register health check tool
+
+
+
+
   server.registerTool(
-    "check-health",
+    "start_context_engine",
     {
-      title: "Check Health Status",
-      description: "Checks the health status of the ContextEngine API and returns connectivity information.",
+      title: "Start Context Engine",
+      description: "Starts the context engine and returns a confirmation message.",
       inputSchema: {},
     },
     async () => {
-      const healthResponse = await checkHealth(clientIp, apiKey, serverUrl);
-
-      if (typeof healthResponse === "string") {
-        return {
-          content: [
-            {
-              type: "text",
-              text: healthResponse,
-            },
-          ],
-        };
-      }
+      // Validate API key based on environment
+      validateApiKey(apiKey, finalServerUrl);
+      
+      const startContextEngineResponse = await startContextEngine(clientIp, apiKey, finalServerUrl);
 
       return {
         content: [
           {
             type: "text",
-            text: `Health Status: ${healthResponse.status}\nTimestamp: ${healthResponse.timestamp}${healthResponse.version ? `\nVersion: ${healthResponse.version}` : ""}`,
-          },
-        ],
-      };
-    }
-  );
-
-  // Register greet tool
-  server.registerTool(
-    "greet",
-    {
-      title: "Send Greeting",
-      description: "Sends a personalized greeting message to test API connectivity.",
-      inputSchema: {
-        name: z
-          .string()
-          .optional()
-          .describe("Optional name to include in the greeting message."),
-      },
-    },
-    async ({ name }) => {
-      const greetingResponse = await greet(name, clientIp, apiKey, serverUrl);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: greetingResponse,
+            text: startContextEngineResponse,
           },
         ],
       };
