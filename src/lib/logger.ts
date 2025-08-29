@@ -16,11 +16,14 @@ export enum LogLevel {
   TRACE = 4,
 }
 
+// Type for log context - allows common types while maintaining type safety
+type LogContext = Record<string, string | number | boolean | null | undefined | Record<string, unknown>>;
+
 interface LogEntry {
   timestamp: string;
   level: string;
   message: string;
-  context?: Record<string, any>;
+  context?: LogContext;
 }
 
 class MCPLogger {
@@ -42,7 +45,7 @@ class MCPLogger {
     return level <= this.level;
   }
 
-  private formatMessage(level: string, message: string, context?: Record<string, any>): string {
+  private formatMessage(level: string, message: string, context?: LogContext): string {
     if (this.isStructured) {
       const entry: LogEntry = {
         timestamp: new Date().toISOString(),
@@ -58,12 +61,7 @@ class MCPLogger {
     return `[${timestamp}] ${level.toUpperCase()}: ${message}${contextStr}`;
   }
 
-  private write(
-    level: LogLevel,
-    levelName: string,
-    message: string,
-    context?: Record<string, any>
-  ): void {
+  private write(level: LogLevel, levelName: string, message: string, context?: LogContext): void {
     if (!this.shouldLog(level)) return;
 
     const formatted = this.formatMessage(levelName, message, context);
@@ -71,33 +69,33 @@ class MCPLogger {
     process.stderr.write(formatted + "\n");
   }
 
-  error(message: string, context?: Record<string, any>): void {
+  error(message: string, context?: LogContext): void {
     this.write(LogLevel.ERROR, "error", message, context);
   }
 
-  warn(message: string, context?: Record<string, any>): void {
+  warn(message: string, context?: LogContext): void {
     this.write(LogLevel.WARN, "warn", message, context);
   }
 
-  info(message: string, context?: Record<string, any>): void {
+  info(message: string, context?: LogContext): void {
     this.write(LogLevel.INFO, "info", message, context);
   }
 
-  debug(message: string, context?: Record<string, any>): void {
+  debug(message: string, context?: LogContext): void {
     this.write(LogLevel.DEBUG, "debug", message, context);
   }
 
-  trace(message: string, context?: Record<string, any>): void {
+  trace(message: string, context?: LogContext): void {
     this.write(LogLevel.TRACE, "trace", message, context);
   }
 
   // Convenience method for API-related logging
-  api(message: string, context?: Record<string, any>): void {
+  api(message: string, context?: LogContext): void {
     this.info(`[API] ${message}`, context);
   }
 
   // Convenience method for MCP-related logging
-  mcp(message: string, context?: Record<string, any>): void {
+  mcp(message: string, context?: LogContext): void {
     this.info(`[MCP] ${message}`, context);
   }
 }

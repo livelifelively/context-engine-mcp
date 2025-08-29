@@ -29,7 +29,7 @@ describe("Server Utils", () => {
   describe("extractHeaderValue", () => {
     it("should return undefined for null/undefined values", () => {
       expect(extractHeaderValue(undefined)).toBeUndefined();
-      expect(extractHeaderValue(null as any)).toBeUndefined();
+      expect(extractHeaderValue(null as unknown as string | string[] | undefined)).toBeUndefined();
     });
 
     it("should return string value as is", () => {
@@ -48,7 +48,7 @@ describe("Server Utils", () => {
   describe("extractBearerToken", () => {
     it("should return undefined for null/undefined values", () => {
       expect(extractBearerToken(undefined)).toBeUndefined();
-      expect(extractBearerToken(null as any)).toBeUndefined();
+      expect(extractBearerToken(null as unknown as string | undefined)).toBeUndefined();
     });
 
     it("should return value without Bearer prefix", () => {

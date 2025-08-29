@@ -20,8 +20,10 @@ ContextEngine addresses the fundamental challenges of AI-human collaboration in 
 - **Documentation-Driven Workflows**: 9 standardized workflows for different development activities
 - **Context Engineering**: Dynamic context composition and provision through knowledge graph
 - **Structured Documentation**: Plan and task documents with hierarchical organization
+- **Local Documentation Setup**: Automatic creation of organized folder structure and configuration files
 - **TypeScript**: Full type safety and modern development experience
 - **Authentication**: Built-in support for API keys and authentication
+- **Comprehensive Logging**: Structured logging with proper MCP compatibility
 
 
 ## 🛠️ Installation
@@ -50,7 +52,27 @@ ContextEngine addresses the fundamental challenges of AI-human collaboration in 
 ContextEngine provides tools for DDD workflow execution:
 
 ### 1. `start_context_engine`
-Starts the ContextEngine system and returns the foundational DDD methodology documentation. This tool establishes the system awareness and provides the base methodology that governs all subsequent interactions.
+Starts the ContextEngine system and automatically sets up the local documentation structure. This tool:
+
+- **Initializes the ContextEngine** via API call to establish system awareness
+- **Creates local documentation structure** with organized folders for DDD workflows
+- **Sets up configuration files** with default settings and workflow definitions
+- **Provides comprehensive feedback** about both remote and local setup status
+
+The tool creates a `.context-engine` directory structure:
+```
+.context-engine/
+├── implemented/          # For completed documentation and implementations
+├── requirements/         # For requirements and specifications  
+└── config/              # For configuration files
+    ├── settings.json     # ContextEngine settings
+    └── workflows.json    # Workflow configurations
+```
+
+**Response Format**: Returns a combined status showing both API response and local setup results with clear emoji indicators:
+- 📁 Success: Documentation structure setup completed
+- ⚠️ Warning: Setup completed with issues
+- ❌ Error: Setup failed (but API call succeeded)
 
 
 <!-- ## 📋 Available Workflows
@@ -83,9 +105,12 @@ Your MCP server accepts the following CLI flags:
 
 ## 📚 Usage
 
-1. **Start ContextEngine**: Use the `start_context_engine` tool to initialize the DDD system
+1. **Start ContextEngine**: Use the `start_context_engine` tool to initialize the DDD system and set up local documentation structure and local documentation setup results
+
 2. **Select Workflow**: Choose from 9 available workflows based on your development objective
+
 3. **Execute Workflow**: Follow the structured workflow phases to complete your development task
+
 4. **Integrate with AI assistants**: Connect to Cursor, VS Code, Claude Code, etc.
 
 ## 📄 License
