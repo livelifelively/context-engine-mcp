@@ -15,6 +15,11 @@
     "withName": "Hello, Alice! API is working correctly.",
     "error": "Greeting service unavailable"
   },
+  "start-context-engine": {
+    "success": "Context engine started successfully",
+    "alreadyRunning": "Context engine is already running",
+    "error": "Failed to start context engine"
+  },
   "errors": {
     "network": "Network error occurred",
     "timeout": "Request timeout",
