@@ -38,7 +38,7 @@ describe("Documentation Setup Module", () => {
       expect(result).toEqual({
         exists: false,
         structure: {
-          implemented: false,
+          implementation: false,
           requirements: false,
           config: false,
         },
@@ -58,7 +58,7 @@ describe("Documentation Setup Module", () => {
       expect(result).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: true,
           config: true,
         },
@@ -73,7 +73,7 @@ describe("Documentation Setup Module", () => {
       // Mock base directory exists
       mockFs.access
         .mockResolvedValueOnce(undefined) // base directory
-        .mockResolvedValueOnce(undefined) // implemented
+        .mockResolvedValueOnce(undefined) // implementation
         .mockRejectedValueOnce(new Error("ENOENT")) // requirements
         .mockResolvedValueOnce(undefined) // config
         .mockResolvedValueOnce(undefined) // settings.json
@@ -84,7 +84,7 @@ describe("Documentation Setup Module", () => {
       expect(result).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: false,
           config: true,
         },
@@ -103,7 +103,7 @@ describe("Documentation Setup Module", () => {
       expect(result).toEqual({
         exists: false,
         structure: {
-          implemented: false,
+          implementation: false,
           requirements: false,
           config: false,
         },
@@ -126,7 +126,7 @@ describe("Documentation Setup Module", () => {
         recursive: true,
       });
       expect(mockFs.mkdir).toHaveBeenCalledWith(
-        join("/test/workspace", ".context-engine", "implemented"),
+        join("/test/workspace", ".context-engine", "implementation"),
         { recursive: true }
       );
       expect(mockFs.mkdir).toHaveBeenCalledWith(
@@ -229,7 +229,7 @@ describe("Documentation Setup Module", () => {
       expect(result.status).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: true,
           config: true,
         },
@@ -244,7 +244,7 @@ describe("Documentation Setup Module", () => {
       // Mock that base exists but subdirectories don't
       mockFs.access
         .mockResolvedValueOnce(undefined) // base directory
-        .mockRejectedValueOnce(new Error("ENOENT")) // implemented
+        .mockRejectedValueOnce(new Error("ENOENT")) // implementation
         .mockRejectedValueOnce(new Error("ENOENT")) // requirements
         .mockRejectedValueOnce(new Error("ENOENT")) // config
         .mockRejectedValueOnce(new Error("ENOENT")) // settings.json
@@ -273,7 +273,7 @@ describe("Documentation Setup Module", () => {
       expect(result.status).toEqual({
         exists: false,
         structure: {
-          implemented: false,
+          implementation: false,
           requirements: false,
           config: false,
         },

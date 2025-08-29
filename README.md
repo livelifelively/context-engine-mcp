@@ -62,7 +62,7 @@ Starts the ContextEngine system and automatically sets up the local documentatio
 The tool creates a `.context-engine` directory structure:
 ```
 .context-engine/
-├── implemented/          # For completed documentation and implementations
+├── implementation/       # For completed documentation and implementations
 ├── requirements/         # For requirements and specifications  
 └── config/              # For configuration files
     ├── settings.json     # ContextEngine settings

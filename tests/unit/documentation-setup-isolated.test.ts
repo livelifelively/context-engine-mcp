@@ -8,14 +8,14 @@ import { randomBytes } from "crypto";
 // This allows us to test the real filesystem operations without mocking process.cwd
 
 const CONTEXT_ENGINE_DIR = ".context-engine";
-const IMPLEMENTED_DIR = "implemented";
+const IMPLEMENTATION_DIR = "implementation";
 const REQUIREMENTS_DIR = "requirements";
 const CONFIG_DIR = "config";
 
 interface DocumentationStatus {
   exists: boolean;
   structure: {
-    implemented: boolean;
+    implementation: boolean;
     requirements: boolean;
     config: boolean;
   };
@@ -50,7 +50,7 @@ async function checkDocumentationStructureInDir(
       return {
         exists: false,
         structure: {
-          implemented: false,
+          implementation: false,
           requirements: false,
           config: false,
         },
@@ -62,12 +62,12 @@ async function checkDocumentationStructureInDir(
     }
 
     // Check subdirectories
-    const implementedPath = join(basePath, IMPLEMENTED_DIR);
+    const implementationPath = join(basePath, IMPLEMENTATION_DIR);
     const requirementsPath = join(basePath, REQUIREMENTS_DIR);
     const configPath = join(basePath, CONFIG_DIR);
 
-    const implementedExists = await fs
-      .access(implementedPath)
+    const implementationExists = await fs
+      .access(implementationPath)
       .then(() => true)
       .catch(() => false);
     const requirementsExists = await fs
@@ -95,7 +95,7 @@ async function checkDocumentationStructureInDir(
     return {
       exists: true,
       structure: {
-        implemented: implementedExists,
+        implementation: implementationExists,
         requirements: requirementsExists,
         config: configExists,
       },
@@ -108,7 +108,7 @@ async function checkDocumentationStructureInDir(
     return {
       exists: false,
       structure: {
-        implemented: false,
+        implementation: false,
         requirements: false,
         config: false,
       },
@@ -130,12 +130,12 @@ async function createDocumentationStructureInDir(workspaceDir: string): Promise<
   await fs.mkdir(basePath, { recursive: true });
 
   // Create subdirectories
-  const implementedPath = join(basePath, IMPLEMENTED_DIR);
+  const implementationPath = join(basePath, IMPLEMENTATION_DIR);
   const requirementsPath = join(basePath, REQUIREMENTS_DIR);
   const configPath = join(basePath, CONFIG_DIR);
 
   await Promise.all([
-    fs.mkdir(implementedPath, { recursive: true }),
+    fs.mkdir(implementationPath, { recursive: true }),
     fs.mkdir(requirementsPath, { recursive: true }),
     fs.mkdir(configPath, { recursive: true }),
   ]);
@@ -202,7 +202,7 @@ async function setupDocumentationStructureInDir(workspaceDir: string): Promise<S
 
     if (
       status.exists &&
-      status.structure.implemented &&
+      status.structure.implementation &&
       status.structure.requirements &&
       status.structure.config &&
       status.configFiles.settings &&
@@ -218,7 +218,7 @@ async function setupDocumentationStructureInDir(workspaceDir: string): Promise<S
     // Create structure if it doesn't exist
     if (
       !status.exists ||
-      !status.structure.implemented ||
+      !status.structure.implementation ||
       !status.structure.requirements ||
       !status.structure.config
     ) {
@@ -281,7 +281,7 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
       expect(result).toEqual({
         exists: false,
         structure: {
-          implemented: false,
+          implementation: false,
           requirements: false,
           config: false,
         },
@@ -295,11 +295,11 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
     it("should detect existing directory structure correctly", async () => {
       // Create the base directory and some subdirectories
       const baseDir = join(testWorkspaceDir, ".context-engine");
-      const implementedDir = join(baseDir, "implemented");
+      const implementationDir = join(baseDir, "implementation");
       const configDir = join(baseDir, "config");
 
       await fs.mkdir(baseDir, { recursive: true });
-      await fs.mkdir(implementedDir, { recursive: true });
+      await fs.mkdir(implementationDir, { recursive: true });
       await fs.mkdir(configDir, { recursive: true });
 
       // Create one config file
@@ -311,7 +311,7 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
       expect(result).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: false, // This one wasn't created
           config: true,
         },
@@ -325,12 +325,12 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
     it("should detect complete structure with all files", async () => {
       // Create complete structure manually
       const baseDir = join(testWorkspaceDir, ".context-engine");
-      const implementedDir = join(baseDir, "implemented");
+      const implementationDir = join(baseDir, "implementation");
       const requirementsDir = join(baseDir, "requirements");
       const configDir = join(baseDir, "config");
 
       await fs.mkdir(baseDir, { recursive: true });
-      await fs.mkdir(implementedDir, { recursive: true });
+      await fs.mkdir(implementationDir, { recursive: true });
       await fs.mkdir(requirementsDir, { recursive: true });
       await fs.mkdir(configDir, { recursive: true });
 
@@ -345,7 +345,7 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
       expect(result).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: true,
           config: true,
         },
@@ -363,24 +363,24 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
 
       // Verify directories were created
       const baseDir = join(testWorkspaceDir, ".context-engine");
-      const implementedDir = join(baseDir, "implemented");
+      const implementationDir = join(baseDir, "implementation");
       const requirementsDir = join(baseDir, "requirements");
       const configDir = join(baseDir, "config");
 
       // Check if directories exist
       await expect(fs.access(baseDir)).resolves.toBeUndefined();
-      await expect(fs.access(implementedDir)).resolves.toBeUndefined();
+      await expect(fs.access(implementationDir)).resolves.toBeUndefined();
       await expect(fs.access(requirementsDir)).resolves.toBeUndefined();
       await expect(fs.access(configDir)).resolves.toBeUndefined();
 
       // Verify they are actually directories
       const baseStat = await fs.stat(baseDir);
-      const implementedStat = await fs.stat(implementedDir);
+      const implementationStat = await fs.stat(implementationDir);
       const requirementsStat = await fs.stat(requirementsDir);
       const configStat = await fs.stat(configDir);
 
       expect(baseStat.isDirectory()).toBe(true);
-      expect(implementedStat.isDirectory()).toBe(true);
+      expect(implementationStat.isDirectory()).toBe(true);
       expect(requirementsStat.isDirectory()).toBe(true);
       expect(configStat.isDirectory()).toBe(true);
     });
@@ -497,7 +497,7 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
       expect(result.status).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: true,
           config: true,
         },
@@ -547,12 +547,12 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
     });
 
     it("should complete partial structure", async () => {
-      // Create partial structure - only base directory and implemented folder
+      // Create partial structure - only base directory and implementation folder
       const baseDir = join(testWorkspaceDir, ".context-engine");
-      const implementedDir = join(baseDir, "implemented");
+      const implementationDir = join(baseDir, "implementation");
 
       await fs.mkdir(baseDir, { recursive: true });
-      await fs.mkdir(implementedDir, { recursive: true });
+      await fs.mkdir(implementationDir, { recursive: true });
 
       const result = await setupDocumentationStructureInDir(testWorkspaceDir);
 
@@ -561,7 +561,7 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
       expect(result.status).toEqual({
         exists: true,
         structure: {
-          implemented: true,
+          implementation: true,
           requirements: true,
           config: true,
         },
@@ -602,16 +602,16 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
 
       // Read directory contents to verify structure
       const baseDirContents = await fs.readdir(baseDir);
-      expect(baseDirContents.sort()).toEqual(["config", "implemented", "requirements"]);
+      expect(baseDirContents.sort()).toEqual(["config", "implementation", "requirements"]);
 
       const configDirContents = await fs.readdir(join(baseDir, "config"));
       expect(configDirContents.sort()).toEqual(["settings.json", "workflows.json"]);
 
       // Verify subdirectories are empty initially
-      const implementedContents = await fs.readdir(join(baseDir, "implemented"));
+      const implementationContents = await fs.readdir(join(baseDir, "implementation"));
       const requirementsContents = await fs.readdir(join(baseDir, "requirements"));
 
-      expect(implementedContents).toEqual([]);
+      expect(implementationContents).toEqual([]);
       expect(requirementsContents).toEqual([]);
     });
 
@@ -632,7 +632,7 @@ describe("Documentation Setup - Isolated Filesystem Tests", () => {
       const finalStatus = await checkDocumentationStructureInDir(testWorkspaceDir);
       expect(finalStatus.exists).toBe(true);
       expect(finalStatus.structure).toEqual({
-        implemented: true,
+        implementation: true,
         requirements: true,
         config: true,
       });

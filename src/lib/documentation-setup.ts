@@ -4,14 +4,14 @@ import { cwd } from "process";
 import { logger } from "./logger.js";
 
 const CONTEXT_ENGINE_DIR = ".context-engine";
-const IMPLEMENTED_DIR = "implemented";
+const IMPLEMENTATION_DIR = "implementation";
 const REQUIREMENTS_DIR = "requirements";
 const CONFIG_DIR = "config";
 
 interface DocumentationStatus {
   exists: boolean;
   structure: {
-    implemented: boolean;
+    implementation: boolean;
     requirements: boolean;
     config: boolean;
   };
@@ -46,7 +46,7 @@ export async function checkDocumentationStructure(
       return {
         exists: false,
         structure: {
-          implemented: false,
+          implementation: false,
           requirements: false,
           config: false,
         },
@@ -58,12 +58,12 @@ export async function checkDocumentationStructure(
     }
 
     // Check subdirectories
-    const implementedPath = join(basePath, IMPLEMENTED_DIR);
+    const implementationPath = join(basePath, IMPLEMENTATION_DIR);
     const requirementsPath = join(basePath, REQUIREMENTS_DIR);
     const configPath = join(basePath, CONFIG_DIR);
 
-    const implementedExists = await fs
-      .access(implementedPath)
+    const implementationExists = await fs
+      .access(implementationPath)
       .then(() => true)
       .catch(() => false);
     const requirementsExists = await fs
@@ -91,7 +91,7 @@ export async function checkDocumentationStructure(
     return {
       exists: true,
       structure: {
-        implemented: implementedExists,
+        implementation: implementationExists,
         requirements: requirementsExists,
         config: configExists,
       },
@@ -107,7 +107,7 @@ export async function checkDocumentationStructure(
     return {
       exists: false,
       structure: {
-        implemented: false,
+        implementation: false,
         requirements: false,
         config: false,
       },
@@ -130,12 +130,12 @@ export async function createDocumentationStructure(projectRoot?: string): Promis
     await fs.mkdir(basePath, { recursive: true });
 
     // Create subdirectories
-    const implementedPath = join(basePath, IMPLEMENTED_DIR);
+    const implementationPath = join(basePath, IMPLEMENTATION_DIR);
     const requirementsPath = join(basePath, REQUIREMENTS_DIR);
     const configPath = join(basePath, CONFIG_DIR);
 
     await Promise.all([
-      fs.mkdir(implementedPath, { recursive: true }),
+      fs.mkdir(implementationPath, { recursive: true }),
       fs.mkdir(requirementsPath, { recursive: true }),
       fs.mkdir(configPath, { recursive: true }),
     ]);
@@ -225,7 +225,7 @@ export async function setupDocumentationStructure(projectRoot: string): Promise<
 
     if (
       status.exists &&
-      status.structure.implemented &&
+      status.structure.implementation &&
       status.structure.requirements &&
       status.structure.config &&
       status.configFiles.settings &&
@@ -241,7 +241,7 @@ export async function setupDocumentationStructure(projectRoot: string): Promise<
     // Create structure if it doesn't exist
     if (
       !status.exists ||
-      !status.structure.implemented ||
+      !status.structure.implementation ||
       !status.structure.requirements ||
       !status.structure.config
     ) {
