@@ -1,0 +1,60 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+env:
+  NODE_VERSION: '22.x'
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run pre-publish checks
+      run: npm run pre-publish
+      
+    - name: Publish to npm
+      run: |
+        # Check if this is an RC release
+        VERSION=$(npm run version --silent)
+        if [[ $VERSION == *"-rc."* ]]; then
+          echo "Publishing RC version: $VERSION"
+          npm publish --tag rc
+        else
+          echo "Publishing stable version: $VERSION"
+          npm publish
+        fi
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
+    - name: Verify publication
+      run: |
+        npm view context-engine
+        echo "✅ Package published successfully!"
+        
+    - name: Test installation
+      run: |
+        npm install -g context-engine
+        context-engine --help
+        
+    - name: Notify success
+      run: |
+        echo "🎉 context-engine v${{ github.event.release.tag_name }} published to npm!"
+        echo "📦 Package: https://www.npmjs.com/package/context-engine"
+        echo "🏷️ Release: ${{ github.event.release.html_url }}"
