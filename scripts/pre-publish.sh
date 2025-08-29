@@ -49,12 +49,15 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 print_status "PASS" "Working directory is clean"
 
-# Check if we're logged into npm
-if ! npm whoami > /dev/null 2>&1; then
-    print_status "FAIL" "Not logged into npm. Run 'npm login' first."
+# Check if we're logged into npm or have NODE_AUTH_TOKEN
+if [ -n "$NODE_AUTH_TOKEN" ]; then
+    print_status "PASS" "Using NODE_AUTH_TOKEN for npm authentication"
+elif ! npm whoami > /dev/null 2>&1; then
+    print_status "FAIL" "Not logged into npm. Run 'npm login' first or set NODE_AUTH_TOKEN."
     exit 1
+else
+    print_status "PASS" "Logged into npm as $(npm whoami)"
 fi
-print_status "PASS" "Logged into npm as $(npm whoami)"
 
 # Check package name
 PACKAGE_NAME=$(node -p "require('./package.json').name")
@@ -64,11 +67,23 @@ if [ "$PACKAGE_NAME" != "context-engine" ]; then
 fi
 print_status "PASS" "Package name is correct: $PACKAGE_NAME"
 
-# Check if package name is available
-if npm view "$PACKAGE_NAME" > /dev/null 2>&1; then
-    print_status "WARN" "Package $PACKAGE_NAME already exists on npm"
+# Check package version
+PACKAGE_VERSION=$(node -p "require('./package.json').version")
+if [ -z "$PACKAGE_VERSION" ] || [ "$PACKAGE_VERSION" = "undefined" ]; then
+    print_status "FAIL" "Package version is not set in package.json"
+    exit 1
+fi
+print_status "PASS" "Package version is set: $PACKAGE_VERSION"
+
+# Check if package name is available (skip in GitHub Actions if no read access)
+if [ -n "$GITHUB_ACTIONS" ]; then
+    print_status "PASS" "Skipping package availability check in CI (requires npm read access)"
 else
-    print_status "PASS" "Package name $PACKAGE_NAME is available"
+    if npm view "$PACKAGE_NAME" > /dev/null 2>&1; then
+        print_status "WARN" "Package $PACKAGE_NAME already exists on npm"
+    else
+        print_status "PASS" "Package name $PACKAGE_NAME is available"
+    fi
 fi
 
 echo ""
@@ -77,6 +92,7 @@ if npm run test:run > /dev/null 2>&1; then
     print_status "PASS" "All tests passed"
 else
     print_status "FAIL" "Tests failed"
+    echo "Running tests with full output:"
     npm run test:run
     exit 1
 fi
@@ -87,9 +103,28 @@ if npm run build > /dev/null 2>&1; then
     print_status "PASS" "Build successful"
 else
     print_status "FAIL" "Build failed"
+    echo "Running build with full output:"
     npm run build
     exit 1
 fi
+
+# Verify build output exists
+if [ ! -d "dist" ]; then
+    print_status "FAIL" "Build output directory 'dist' not found"
+    exit 1
+fi
+if [ ! -f "dist/index.js" ]; then
+    print_status "FAIL" "Build output file 'dist/index.js' not found"
+    exit 1
+fi
+
+# Check executable permissions
+if [ ! -x "dist/index.js" ]; then
+    print_status "WARN" "Build output file 'dist/index.js' is not executable"
+    chmod +x dist/index.js
+    print_status "PASS" "Made dist/index.js executable"
+fi
+print_status "PASS" "Build output verified"
 
 echo ""
 echo "🔍 Running linting..."
@@ -97,6 +132,7 @@ if npm run lint > /dev/null 2>&1; then
     print_status "PASS" "Linting passed"
 else
     print_status "FAIL" "Linting failed"
+    echo "Running lint with full output:"
     npm run lint
     exit 1
 fi
@@ -107,6 +143,7 @@ if npm run type-check > /dev/null 2>&1; then
     print_status "PASS" "Type checking passed"
 else
     print_status "FAIL" "Type checking failed"
+    echo "Running type check with full output:"
     npm run type-check
     exit 1
 fi
@@ -142,11 +179,22 @@ fi
 
 echo ""
 echo "📊 Coverage check..."
-COVERAGE_OUTPUT=$(npm run test:coverage 2>/dev/null | grep -E "All files|src" | tail -1)
-if echo "$COVERAGE_OUTPUT" | grep -q "100\|9[0-9]\|8[0-9]"; then
-    print_status "PASS" "Coverage meets threshold"
+if [ -n "$GITHUB_ACTIONS" ]; then
+    # In CI, run coverage but don't fail on low coverage
+    COVERAGE_OUTPUT=$(npm run test:coverage 2>/dev/null | grep -E "All files|src" | tail -1 || echo "Coverage check failed")
+    if echo "$COVERAGE_OUTPUT" | grep -q "100\|9[0-9]\|8[0-9]"; then
+        print_status "PASS" "Coverage meets threshold"
+    else
+        print_status "WARN" "Coverage may be low: $COVERAGE_OUTPUT"
+    fi
 else
-    print_status "WARN" "Coverage may be low: $COVERAGE_OUTPUT"
+    # Local development - run coverage check
+    COVERAGE_OUTPUT=$(npm run test:coverage 2>/dev/null | grep -E "All files|src" | tail -1)
+    if echo "$COVERAGE_OUTPUT" | grep -q "100\|9[0-9]\|8[0-9]"; then
+        print_status "PASS" "Coverage meets threshold"
+    else
+        print_status "WARN" "Coverage may be low: $COVERAGE_OUTPUT"
+    fi
 fi
 
 echo ""
@@ -158,7 +206,7 @@ echo "✅ Type checking passed"
 echo "✅ Package name correct: $PACKAGE_NAME"
 echo "✅ Working directory clean"
 echo "✅ Branch check passed"
-echo "✅ Logged into npm"
+echo "✅ NPM authentication configured"
 echo "✅ Package dry run successful"
 
 echo ""
