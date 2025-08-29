@@ -26,13 +26,20 @@ print_status() {
     fi
 }
 
-# Check if we're on master branch
+# Check if we're on master branch or in GitHub Actions
 CURRENT_BRANCH=$(git branch --show-current)
-if [ "$CURRENT_BRANCH" != "master" ]; then
-    print_status "FAIL" "Must be on master branch to publish (currently on $CURRENT_BRANCH)"
-    exit 1
+if [ -n "$GITHUB_ACTIONS" ]; then
+    # In GitHub Actions, we're typically on a detached HEAD for releases
+    # Skip branch check for GitHub Actions as releases are created from tags
+    print_status "PASS" "Running in GitHub Actions - release workflow"
+else
+    # Local development - must be on master branch
+    if [ "$CURRENT_BRANCH" != "master" ]; then
+        print_status "FAIL" "Must be on master branch to publish (currently on $CURRENT_BRANCH)"
+        exit 1
+    fi
+    print_status "PASS" "On master branch"
 fi
-print_status "PASS" "On master branch"
 
 # Check if working directory is clean
 if [ -n "$(git status --porcelain)" ]; then
@@ -150,7 +157,7 @@ echo "✅ Linting passed"
 echo "✅ Type checking passed"
 echo "✅ Package name correct: $PACKAGE_NAME"
 echo "✅ Working directory clean"
-echo "✅ On master branch"
+echo "✅ Branch check passed"
 echo "✅ Logged into npm"
 echo "✅ Package dry run successful"
 
