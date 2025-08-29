@@ -9,7 +9,6 @@ const apiResponses = JSON.parse(
 );
 import { getTestConfig, shouldUseRealApi } from "../config/test-config.js";
 
-
 // Create a mock fetch function
 const mockFetch = vi.fn();
 
@@ -42,7 +41,12 @@ describe("API Functions", () => {
         });
       }
 
-      const result = await startContextEngine(undefined, undefined, config.apiBaseUrl);
+      const result = await startContextEngine(
+        "/tmp/test-project",
+        undefined,
+        undefined,
+        config.apiBaseUrl
+      );
 
       // Same expectations regardless of mock or real
       expect(result).toBeDefined();
@@ -74,9 +78,10 @@ describe("API Functions", () => {
         text: async () => "No content available",
       });
 
-      const result = await startContextEngine();
+      const result = await startContextEngine("/tmp/test-project");
 
-      expect(result).toBe("Context engine start request sent but no confirmation available.");
+      expect(result).toContain("Context engine start request sent but no confirmation available.");
+      expect(result).toContain("📁 Local Documentation Structure");
     });
 
     it("should throw error on network failure", async () => {
@@ -87,9 +92,9 @@ describe("API Functions", () => {
 
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(startContextEngine()).rejects.toThrow(
-        "Failed to start context engine: Error: Network error"
-      );
+      const result = await startContextEngine("/tmp/test-project");
+      expect(result).toContain("⚠️  ContextEngine API call failed: Network error");
+      expect(result).toContain("📁 Local Documentation Structure");
     });
 
     it("should throw error on API error response", async () => {
@@ -103,9 +108,11 @@ describe("API Functions", () => {
         status: 500,
       });
 
-      await expect(startContextEngine()).rejects.toThrow(
-        "Failed to start context engine: Error: Failed to start context engine. Please try again later. Error code: 500"
+      const result = await startContextEngine("/tmp/test-project");
+      expect(result).toContain(
+        "⚠️  ContextEngine API call failed: Failed to start context engine. Please try again later. Error code: 500"
       );
+      expect(result).toContain("📁 Local Documentation Structure");
     });
 
     it("should use custom server URL when provided", async () => {
@@ -119,7 +126,7 @@ describe("API Functions", () => {
         });
       }
 
-      const result = await startContextEngine(undefined, undefined, customUrl);
+      const result = await startContextEngine("/tmp/test-project", undefined, undefined, customUrl);
 
       // Same expectations regardless of mock or real
       expect(result).toBeDefined();
@@ -153,7 +160,7 @@ describe("API Functions", () => {
         text: async () => mockResponse,
       });
 
-      await startContextEngine(clientIp, apiKey);
+      await startContextEngine("/tmp/test-project", clientIp, apiKey);
 
       expect(mockFetch).toHaveBeenCalledWith(expect.any(URL), {
         headers: {

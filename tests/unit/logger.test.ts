@@ -3,6 +3,7 @@ import { MCPLogger } from "../../src/lib/logger.js";
 
 describe("MCPLogger", () => {
   let logger: MCPLogger;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let stderrSpy: any;
 
   beforeEach(() => {

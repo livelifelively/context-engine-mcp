@@ -30,8 +30,10 @@ interface SetupResult {
 /**
  * Checks if the ContextEngine documentation structure exists
  */
-export async function checkDocumentationStructure(): Promise<DocumentationStatus> {
-  const basePath = join(cwd(), CONTEXT_ENGINE_DIR);
+export async function checkDocumentationStructure(
+  projectRoot?: string
+): Promise<DocumentationStatus> {
+  const basePath = join(projectRoot || cwd(), CONTEXT_ENGINE_DIR);
 
   try {
     // Check if base directory exists
@@ -120,8 +122,8 @@ export async function checkDocumentationStructure(): Promise<DocumentationStatus
 /**
  * Creates the ContextEngine documentation structure
  */
-export async function createDocumentationStructure(): Promise<void> {
-  const basePath = join(cwd(), CONTEXT_ENGINE_DIR);
+export async function createDocumentationStructure(projectRoot?: string): Promise<void> {
+  const basePath = join(projectRoot || cwd(), CONTEXT_ENGINE_DIR);
 
   try {
     // Create base directory
@@ -150,8 +152,8 @@ export async function createDocumentationStructure(): Promise<void> {
 /**
  * Creates default configuration files
  */
-export async function createDefaultConfigFiles(): Promise<void> {
-  const configPath = join(cwd(), CONTEXT_ENGINE_DIR, CONFIG_DIR);
+export async function createDefaultConfigFiles(projectRoot?: string): Promise<void> {
+  const configPath = join(projectRoot || cwd(), CONTEXT_ENGINE_DIR, CONFIG_DIR);
 
   try {
     const defaultSettings = {
@@ -211,9 +213,15 @@ export async function createDefaultConfigFiles(): Promise<void> {
 /**
  * Sets up the complete documentation structure if it doesn't exist
  */
-export async function setupDocumentationStructure(): Promise<SetupResult> {
+export async function setupDocumentationStructure(projectRoot: string): Promise<SetupResult> {
+  if (!projectRoot) {
+    throw new Error("Project root directory is required for documentation structure setup");
+  }
+
   try {
-    const status = await checkDocumentationStructure();
+    logger.info("Setting up documentation structure", { projectRoot });
+
+    const status = await checkDocumentationStructure(projectRoot);
 
     if (
       status.exists &&
@@ -237,15 +245,15 @@ export async function setupDocumentationStructure(): Promise<SetupResult> {
       !status.structure.requirements ||
       !status.structure.config
     ) {
-      await createDocumentationStructure();
+      await createDocumentationStructure(projectRoot);
     }
 
     // Create config files if they don't exist
     if (!status.configFiles.settings || !status.configFiles.workflows) {
-      await createDefaultConfigFiles();
+      await createDefaultConfigFiles(projectRoot);
     }
 
-    const finalStatus = await checkDocumentationStructure();
+    const finalStatus = await checkDocumentationStructure(projectRoot);
 
     return {
       success: true,
@@ -256,7 +264,7 @@ export async function setupDocumentationStructure(): Promise<SetupResult> {
     logger.error("Error in setupDocumentationStructure", {
       error: error instanceof Error ? error.message : String(error),
     });
-    const errorStatus = await checkDocumentationStructure();
+    const errorStatus = await checkDocumentationStructure(projectRoot);
     return {
       success: false,
       message: `Failed to setup documentation structure: ${error}`,

@@ -27,7 +27,9 @@ describe("MCP Server Integration", () => {
     // Flow: Test → MCP Client → Local MCP Server → API (local or remote) + Local Documentation Setup
     const result = await MCPTestUtils.client.callTool({
       name: "start_context_engine",
-      arguments: {},
+      arguments: {
+        projectRoot: "/tmp/test-project",
+      },
     });
 
     const content = result.content as Array<{ text: string }>;

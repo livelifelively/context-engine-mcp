@@ -17,7 +17,10 @@ export enum LogLevel {
 }
 
 // Type for log context - allows common types while maintaining type safety
-type LogContext = Record<string, string | number | boolean | null | undefined | Record<string, unknown>>;
+type LogContext = Record<
+  string,
+  string | number | boolean | null | undefined | Record<string, unknown>
+>;
 
 interface LogEntry {
   timestamp: string;
