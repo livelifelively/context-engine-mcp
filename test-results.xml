@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="56" failures="0" errors="0" time="0.043766958">
+    <testsuite name="tests/integration/mcp-server.test.ts" timestamp="2025-08-29T03:45:48.359Z" hostname="Dollys-MacBook-Air.local" tests="1" failures="0" errors="0" skipped="0" time="0.003251583">
+        <testcase classname="tests/integration/mcp-server.test.ts" name="MCP Server Integration &gt; should execute start_context_engine tool and return valid response" time="0.000604833">
+            <system-out>
+Skipping MCP server integration test in CI environment
+
+            </system-out>
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/api.test.ts" timestamp="2025-08-29T03:45:48.359Z" hostname="Dollys-MacBook-Air.local" tests="6" failures="0" errors="0" skipped="0" time="0.009842625">
+        <testcase classname="tests/unit/api.test.ts" name="API Functions &gt; startContextEngine &gt; should return success message on successful API call" time="0.002911958">
+        </testcase>
+        <testcase classname="tests/unit/api.test.ts" name="API Functions &gt; startContextEngine &gt; should return fallback message when API returns empty content" time="0.000277416">
+        </testcase>
+        <testcase classname="tests/unit/api.test.ts" name="API Functions &gt; startContextEngine &gt; should throw error on network failure" time="0.001849792">
+            <system-err>
+Start context engine API call failed: Error: Network error
+    at [90m/Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mtests/unit/api.test.ts:88:39
+    at [90mfile:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:155:11
+    at [90mfile:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:752:26
+    at [90mfile:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout [90m(file:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1863:10[90m)[39m
+    at runTest [90m(file:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1574:12[90m)[39m
+    at runSuite [90m(file:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1729:8[90m)[39m
+    at runSuite [90m(file:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1729:8[90m)[39m
+    at runSuite [90m(file:///Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39mnode_modules/[4m@vitest[24m/runner/dist/chunk-hooks.js:1729:8[90m)[39m
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/unit/api.test.ts" name="API Functions &gt; startContextEngine &gt; should throw error on API error response" time="0.000702208">
+            <system-err>
+Failed to start context engine. Please try again later. Error code: 500
+
+Start context engine API call failed: Error: Failed to start context engine. Please try again later. Error code: 500
+    at makeApiRequest [90m(/Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39msrc/lib/api.ts:75:11[90m)[39m
+    at startContextEngine [90m(/Users/dollyparmar/dev/context-engine/context-engine-mcp-ts/[39msrc/lib/api.ts:97:22[90m)[39m
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/unit/api.test.ts" name="API Functions &gt; startContextEngine &gt; should use custom server URL when provided" time="0.000664666">
+        </testcase>
+        <testcase classname="tests/unit/api.test.ts" name="API Functions &gt; startContextEngine &gt; should include client IP and API key in headers when provided" time="0.000806541">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/encryption.test.ts" timestamp="2025-08-29T03:45:48.362Z" hostname="Dollys-MacBook-Air.local" tests="10" failures="0" errors="0" skipped="0" time="0.006405958">
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should return empty headers when no parameters provided" time="0.001472583">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should include client IP when provided" time="0.00056775">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should include Authorization header when API key provided" time="0.000130666">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should include both client IP and API key when both provided" time="0.000313625">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should include extra headers when provided" time="0.000198167">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should combine all headers when all parameters provided" time="0.000332083">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should not override extra headers with built-in headers" time="0.000237958">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should handle empty string client IP" time="0.00014525">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should handle empty string API key" time="0.000233792">
+        </testcase>
+        <testcase classname="tests/unit/encryption.test.ts" name="Encryption Functions &gt; generateHeaders &gt; should handle null and undefined values gracefully" time="0.000121791">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/logger.test.ts" timestamp="2025-08-29T03:45:48.363Z" hostname="Dollys-MacBook-Air.local" tests="9" failures="0" errors="0" skipped="0" time="0.010524">
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Log Levels &gt; should respect log level configuration" time="0.003025375">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Log Levels &gt; should default to INFO level when no environment variable is set" time="0.001172084">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Output Format &gt; should write to stderr (not stdout)" time="0.000378833">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Output Format &gt; should include timestamp in output" time="0.000210125">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Output Format &gt; should include log level in output" time="0.000249458">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Structured Logging &gt; should output JSON when structured logging is enabled" time="0.000715083">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Structured Logging &gt; should output plain text when structured logging is disabled" time="0.000732583">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Convenience Methods &gt; should prefix API messages correctly" time="0.000296042">
+        </testcase>
+        <testcase classname="tests/unit/logger.test.ts" name="MCPLogger &gt; Convenience Methods &gt; should prefix MCP messages correctly" time="0.000506084">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/server-utils.test.ts" timestamp="2025-08-29T03:45:48.364Z" hostname="Dollys-MacBook-Air.local" tests="27" failures="0" errors="0" skipped="0" time="0.009911833">
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractHeaderValue &gt; should return undefined for null/undefined values" time="0.000798375">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractHeaderValue &gt; should return string value as is" time="0.000225291">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractHeaderValue &gt; should return first value from array" time="0.000092375">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractHeaderValue &gt; should return undefined from empty array" time="0.000146583">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractBearerToken &gt; should return undefined for null/undefined values" time="0.000226125">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractBearerToken &gt; should return value without Bearer prefix" time="0.000086667">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractBearerToken &gt; should return value with Bearer prefix and extra spaces" time="0.0000675">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractBearerToken &gt; should return value as is when no Bearer prefix" time="0.000119833">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractBearerToken &gt; should handle array values" time="0.000300333">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should extract API key from Authorization header" time="0.000100166">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should extract API key from ContextEngine-API-Key header" time="0.000064208">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should extract API key from context-engine-api-key header" time="0.000074292">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should extract API key from X-API-Key header" time="0.000057583">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should extract API key from x-api-key header" time="0.000055083">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should return undefined when no API key headers present" time="0.000052292">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; extractApiKey &gt; should prioritize Authorization header over others" time="0.000105208">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should extract IP from X-Forwarded-For header" time="0.000222709">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should extract IP from X-Forwarded-For header with mixed case" time="0.000436042">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should return first public IP from X-Forwarded-For" time="0.000093">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should return first IP if all are private" time="0.000060292">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should handle IPv6-mapped IPv4 addresses" time="0.00006625">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should fallback to socket remote address" time="0.000060375">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should return undefined when no IP information available" time="0.000055125">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; getClientIp &gt; should handle array format of X-Forwarded-For" time="0.00006725">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; setupCorsHeaders &gt; should set all required CORS headers" time="0.001811542">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; sendErrorResponse &gt; should send error response with status code and message" time="0.000384833">
+        </testcase>
+        <testcase classname="tests/unit/server-utils.test.ts" name="Server Utils &gt; handlePreflightRequest &gt; should send 200 response for OPTIONS request" time="0.000312">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/setup.test.ts" timestamp="2025-08-29T03:45:48.368Z" hostname="Dollys-MacBook-Air.local" tests="3" failures="0" errors="0" skipped="0" time="0.003830959">
+        <testcase classname="tests/unit/setup.test.ts" name="Test Setup &gt; should have access to test fixtures" time="0.000665916">
+        </testcase>
+        <testcase classname="tests/unit/setup.test.ts" name="Test Setup &gt; should have proper MCP request structure" time="0.000420292">
+        </testcase>
+        <testcase classname="tests/unit/setup.test.ts" name="Test Setup &gt; should have proper MCP response structure" time="0.000215625">
+        </testcase>
+    </testsuite>
+</testsuites>
