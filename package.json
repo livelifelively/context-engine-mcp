@@ -1,6 +1,6 @@
 {
   "name": "context-engine",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "ContextEngine MCP Server - Up-to-date documentation and code examples for any library",
   "scripts": {
     "test": "vitest",
