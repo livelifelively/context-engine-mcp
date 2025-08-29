@@ -113,7 +113,7 @@ describe("Encryption Functions", () => {
     });
 
     it("should handle null and undefined values gracefully", () => {
-      const headers1 = generateHeaders(null as any, null as any);
+      const headers1 = generateHeaders(null as unknown as string | undefined, null as unknown as string | undefined);
       const headers2 = generateHeaders(undefined, undefined);
 
       expect(headers1).toEqual({});
