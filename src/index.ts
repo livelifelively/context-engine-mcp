@@ -2,7 +2,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+
 import { startContextEngine } from "./lib/api.js";
 import { createServer } from "http";
 import { IncomingMessage, ServerResponse } from "http";
@@ -62,9 +62,8 @@ function validateCliOptions(options: CliOptions): void {
  */
 function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: string) {
   // Priority: CLI > ENV > MCP config > default
-  const finalServerUrl = serverUrl || 
-                        process.env.CONTEXT_ENGINE_SERVER_URL || 
-                        "https://contextengine.in";
+  const finalServerUrl =
+    serverUrl || process.env.CONTEXT_ENGINE_SERVER_URL || "https://contextengine.in";
   const server = new McpServer(
     {
       name: "ContextEngine",
@@ -74,10 +73,6 @@ function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: st
       instructions: "Use this server to start the context engine.",
     }
   );
-
-
-
-
 
   server.registerTool(
     "start_context_engine",
@@ -89,7 +84,7 @@ function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: st
     async () => {
       // Validate API key based on environment
       validateApiKey(apiKey, finalServerUrl);
-      
+
       const startContextEngineResponse = await startContextEngine(clientIp, apiKey, finalServerUrl);
 
       return {
@@ -109,7 +104,13 @@ function createServerInstance(clientIp?: string, apiKey?: string, serverUrl?: st
 /**
  * Handles HTTP transport requests
  */
-async function handleHttpTransport(req: IncomingMessage, res: ServerResponse, clientIp?: string, apiKey?: string, serverUrl?: string): Promise<void> {
+async function handleHttpTransport(
+  req: IncomingMessage,
+  res: ServerResponse,
+  clientIp?: string,
+  apiKey?: string,
+  serverUrl?: string
+): Promise<void> {
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
   });
@@ -121,14 +122,20 @@ async function handleHttpTransport(req: IncomingMessage, res: ServerResponse, cl
 /**
  * Handles SSE transport requests
  */
-async function handleSseTransport(req: IncomingMessage, res: ServerResponse, clientIp?: string, apiKey?: string, serverUrl?: string): Promise<void> {
+async function handleSseTransport(
+  req: IncomingMessage,
+  res: ServerResponse,
+  clientIp?: string,
+  apiKey?: string,
+  serverUrl?: string
+): Promise<void> {
   const sseTransport = new SSEServerTransport("/messages", res);
   sseTransports[sseTransport.sessionId] = sseTransport;
-  
+
   res.on("close", () => {
     delete sseTransports[sseTransport.sessionId];
   });
-  
+
   const requestServer = createServerInstance(clientIp, apiKey, serverUrl);
   await requestServer.connect(sseTransport);
 }
@@ -137,7 +144,8 @@ async function handleSseTransport(req: IncomingMessage, res: ServerResponse, cli
  * Handles POST messages for SSE sessions
  */
 async function handleSsePostMessage(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  const sessionId = new URL(req.url || "", `http://${req.headers.host}`).searchParams.get("sessionId") ?? "";
+  const sessionId =
+    new URL(req.url || "", `http://${req.headers.host}`).searchParams.get("sessionId") ?? "";
 
   if (!sessionId) {
     sendErrorResponse(res, 400, "Missing sessionId parameter");
@@ -156,7 +164,7 @@ async function handleSsePostMessage(req: IncomingMessage, res: ServerResponse): 
 /**
  * Creates HTTP server with port fallback logic
  */
-function createServerWithFallback(initialPort: number, maxAttempts = 10) {
+function createServerWithFallback(initialPort: number, _maxAttempts = 10) {
   const httpServer = createServer(async (req, res) => {
     const url = new URL(req.url || "", `http://${req.headers.host}`).pathname;
 
@@ -191,11 +199,11 @@ function createServerWithFallback(initialPort: number, maxAttempts = 10) {
     }
   });
 
-  const startServer = (port: number, maxAttempts = 10) => {
+  const startServer = (port: number, _maxAttempts = 10) => {
     httpServer.once("error", (err: NodeJS.ErrnoException) => {
-      if (err.code === "EADDRINUSE" && port < initialPort + maxAttempts) {
+      if (err.code === "EADDRINUSE" && port < initialPort + _maxAttempts) {
         console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
-        startServer(port + 1, maxAttempts);
+        startServer(port + 1, _maxAttempts);
       } else {
         console.error(`Failed to start server: ${err.message}`);
         process.exit(1);

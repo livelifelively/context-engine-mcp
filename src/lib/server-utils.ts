@@ -100,13 +100,13 @@ export function handlePreflightRequest(res: ServerResponse): void {
  * @returns void - throws error if validation fails
  */
 export function validateApiKey(apiKey: string | undefined, serverUrl?: string): void {
-  const isLocalServer = serverUrl && serverUrl.includes('localhost');
-  
+  const isLocalServer = serverUrl && serverUrl.includes("localhost");
+
   if (isLocalServer) {
     logger.info(`Using local server: ${serverUrl}`);
     // For local server, allow test API keys or skip validation
-    if (!apiKey || apiKey === 'local') {
-      logger.info('Using test API key for local development');
+    if (!apiKey || apiKey === "local") {
+      logger.info("Using test API key for local development");
     }
   } else {
     // Validate API key for production

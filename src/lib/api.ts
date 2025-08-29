@@ -33,11 +33,11 @@ if (PROXY_URL && !PROXY_URL.startsWith("$") && /^(http|https):\/\//i.test(PROXY_
 function buildApiUrl(endpoint: string, params: Record<string, string>, serverUrl?: string): URL {
   const baseUrl = serverUrl || DEFAULT_CONTEXT_ENGINE_API_BASE_URL;
   const url = new URL(`${baseUrl}/api/${endpoint}`);
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value) url.searchParams.set(key, value);
   });
-  
+
   return url;
 }
 
@@ -46,7 +46,7 @@ function buildApiUrl(endpoint: string, params: Record<string, string>, serverUrl
  */
 function handleApiError(response: Response, operation: string): string {
   const errorCode = response.status;
-  
+
   switch (errorCode) {
     case 429:
       return "Rate limited due to too many requests. Please try again later.";
@@ -63,18 +63,18 @@ function handleApiError(response: Response, operation: string): string {
  * Makes an API request with common error handling
  */
 async function makeApiRequest(
-  url: URL, 
-  headers: HeadersInit, 
+  url: URL,
+  headers: HeadersInit,
   operation: string
 ): Promise<Response> {
   const response = await fetch(url, { headers });
-  
+
   if (!response.ok) {
     const errorMessage = handleApiError(response, operation);
     console.error(errorMessage);
     throw new Error(errorMessage);
   }
-  
+
   return response;
 }
 
@@ -93,14 +93,14 @@ export async function startContextEngine(
   try {
     const url = buildApiUrl("start-context-engine", {}, serverUrl);
     const headers = generateHeaders(clientIp, apiKey, { "X-ContextEngine-Source": "mcp-server" });
-    
+
     const response = await makeApiRequest(url, headers, "start context engine");
     const text = await response.text();
-    
+
     if (!text || text === "No content available") {
       return "Context engine start request sent but no confirmation available.";
     }
-    
+
     return text;
   } catch (error) {
     console.error("Start context engine API call failed:", error);

@@ -1,9 +1,9 @@
-import { http, HttpResponse } from 'msw';
-import { server } from '../setup.js';
+import { http, HttpResponse } from "msw";
+import { server } from "../setup.js";
 
 /**
  * API Mock Utilities for Phase 5 testing
- * 
+ *
  * Provides reusable mock scenarios for testing realistic API responses,
  * error conditions, and edge cases.
  */
@@ -12,13 +12,13 @@ export class APIMockUtils {
   /**
    * Mock successful health response
    */
-  static mockSuccessfulHealth(status = 'healthy', version = '1.0.0') {
+  static mockSuccessfulHealth(status = "healthy", version = "1.0.0") {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
+      http.get("https://contextengine.in/api/v1/health", () => {
         return HttpResponse.json({
           status,
           timestamp: new Date().toISOString(),
-          version
+          version,
         });
       })
     );
@@ -29,10 +29,10 @@ export class APIMockUtils {
    */
   static mockSuccessfulGreet(message?: string) {
     server.use(
-      http.get('https://contextengine.in/api/v1/greet*', ({ request }) => {
+      http.get("https://contextengine.in/api/v1/greet*", ({ request }) => {
         const url = new URL(request.url);
-        const name = url.searchParams.get('name');
-        const response = message || `Hello, ${name || 'there'}! API is working correctly.`;
+        const name = url.searchParams.get("name");
+        const response = message || `Hello, ${name || "there"}! API is working correctly.`;
         return HttpResponse.json(response);
       })
     );
@@ -43,7 +43,7 @@ export class APIMockUtils {
    */
   static mockNetworkError() {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
+      http.get("https://contextengine.in/api/v1/health", () => {
         return HttpResponse.error();
       })
     );
@@ -54,11 +54,8 @@ export class APIMockUtils {
    */
   static mockHttpError(status: number, message: string) {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
-        return HttpResponse.json(
-          { error: message },
-          { status }
-        );
+      http.get("https://contextengine.in/api/v1/health", () => {
+        return HttpResponse.json({ error: message }, { status });
       })
     );
   }
@@ -67,21 +64,24 @@ export class APIMockUtils {
    * Mock authentication error
    */
   static mockAuthError() {
-    return this.mockHttpError(401, 'Unauthorized. Please check your API key.');
+    return this.mockHttpError(401, "Unauthorized. Please check your API key.");
   }
 
   /**
    * Mock rate limit error
    */
   static mockRateLimitError() {
-    return this.mockHttpError(429, 'Rate limited due to too many requests. Please try again later.');
+    return this.mockHttpError(
+      429,
+      "Rate limited due to too many requests. Please try again later."
+    );
   }
 
   /**
    * Mock server error
    */
   static mockServerError() {
-    return this.mockHttpError(500, 'Internal server error');
+    return this.mockHttpError(500, "Internal server error");
   }
 
   /**
@@ -89,19 +89,16 @@ export class APIMockUtils {
    */
   static mockAuthScenario(validApiKey: string) {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', ({ request }) => {
-        const authHeader = request.headers.get('Authorization');
+      http.get("https://contextengine.in/api/v1/health", ({ request }) => {
+        const authHeader = request.headers.get("Authorization");
         if (authHeader === `Bearer ${validApiKey}`) {
           return HttpResponse.json({
-            status: 'authenticated',
+            status: "authenticated",
             timestamp: new Date().toISOString(),
-            version: '1.0.0'
+            version: "1.0.0",
           });
         } else {
-          return HttpResponse.json(
-            { error: 'Invalid API key' },
-            { status: 401 }
-          );
+          return HttpResponse.json({ error: "Invalid API key" }, { status: 401 });
         }
       })
     );
@@ -112,20 +109,17 @@ export class APIMockUtils {
    */
   static mockClientIPScenario(validClientIP: string) {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', ({ request }) => {
-        const clientIp = request.headers.get('X-Client-IP');
+      http.get("https://contextengine.in/api/v1/health", ({ request }) => {
+        const clientIp = request.headers.get("X-Client-IP");
         if (clientIp === validClientIP) {
           return HttpResponse.json({
-            status: 'healthy',
+            status: "healthy",
             timestamp: new Date().toISOString(),
-            version: '1.0.0',
-            clientIp: validClientIP
+            version: "1.0.0",
+            clientIp: validClientIP,
           });
         } else {
-          return HttpResponse.json(
-            { error: 'Invalid client IP' },
-            { status: 403 }
-          );
+          return HttpResponse.json({ error: "Invalid client IP" }, { status: 403 });
         }
       })
     );
@@ -136,9 +130,9 @@ export class APIMockUtils {
    */
   static mockMalformedResponse() {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
-        return new HttpResponse('{ invalid json', {
-          headers: { 'Content-Type': 'application/json' }
+      http.get("https://contextengine.in/api/v1/health", () => {
+        return new HttpResponse("{ invalid json", {
+          headers: { "Content-Type": "application/json" },
         });
       })
     );
@@ -149,8 +143,8 @@ export class APIMockUtils {
    */
   static mockEmptyResponse() {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
-        return HttpResponse.json('');
+      http.get("https://contextengine.in/api/v1/health", () => {
+        return HttpResponse.json("");
       })
     );
   }
@@ -160,12 +154,12 @@ export class APIMockUtils {
    */
   static mockSlowResponse(delayMs = 50) {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', async () => {
-        await new Promise(resolve => setTimeout(resolve, delayMs));
+      http.get("https://contextengine.in/api/v1/health", async () => {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
         return HttpResponse.json({
-          status: 'healthy',
+          status: "healthy",
           timestamp: new Date().toISOString(),
-          version: '1.0.0'
+          version: "1.0.0",
         });
       })
     );
@@ -176,14 +170,14 @@ export class APIMockUtils {
    */
   static mockLargeResponse(size = 1000) {
     const largePayload = {
-      status: 'healthy',
+      status: "healthy",
       timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      data: Array(size).fill('test').join('')
+      version: "1.0.0",
+      data: Array(size).fill("test").join(""),
     };
 
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
+      http.get("https://contextengine.in/api/v1/health", () => {
         return HttpResponse.json(largePayload);
       })
     );
@@ -194,24 +188,24 @@ export class APIMockUtils {
    */
   static mockProductionResponse() {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', () => {
+      http.get("https://contextengine.in/api/v1/health", () => {
         return HttpResponse.json({
-          status: 'operational',
+          status: "operational",
           timestamp: new Date().toISOString(),
-          version: '1.0.13',
+          version: "1.0.13",
           uptime: 99.9,
           services: {
-            database: 'healthy',
-            cache: 'healthy',
-            external_apis: 'healthy'
-          }
+            database: "healthy",
+            cache: "healthy",
+            external_apis: "healthy",
+          },
         });
       }),
-      http.get('https://contextengine.in/api/v1/greet*', ({ request }) => {
+      http.get("https://contextengine.in/api/v1/greet*", ({ request }) => {
         const url = new URL(request.url);
-        const name = url.searchParams.get('name');
+        const name = url.searchParams.get("name");
         return HttpResponse.json(
-          name ? `Hello, ${name}! Welcome to ContextEngine.` : 'Hello! Welcome to ContextEngine.'
+          name ? `Hello, ${name}! Welcome to ContextEngine.` : "Hello! Welcome to ContextEngine."
         );
       })
     );
@@ -222,20 +216,20 @@ export class APIMockUtils {
    */
   static mockAPIVersioning() {
     server.use(
-      http.get('https://contextengine.in/api/v1/health', ({ request }) => {
-        const version = request.headers.get('X-API-Version');
-        if (version === '2.0') {
+      http.get("https://contextengine.in/api/v1/health", ({ request }) => {
+        const version = request.headers.get("X-API-Version");
+        if (version === "2.0") {
           return HttpResponse.json({
-            status: 'healthy',
+            status: "healthy",
             timestamp: new Date().toISOString(),
-            version: '2.0.0',
-            features: ['enhanced_health', 'metrics']
+            version: "2.0.0",
+            features: ["enhanced_health", "metrics"],
           });
         } else {
           return HttpResponse.json({
-            status: 'healthy',
+            status: "healthy",
             timestamp: new Date().toISOString(),
-            version: '1.0.0'
+            version: "1.0.0",
           });
         }
       })
@@ -249,16 +243,16 @@ export class APIMockUtils {
     server.use(
       http.get(`${baseURL}/api/v1/health`, () => {
         return HttpResponse.json({
-          status: 'healthy',
+          status: "healthy",
           timestamp: new Date().toISOString(),
-          version: '1.0.0',
-          server: baseURL
+          version: "1.0.0",
+          server: baseURL,
         });
       }),
       http.get(`${baseURL}/api/v1/greet*`, ({ request }) => {
         const url = new URL(request.url);
-        const name = url.searchParams.get('name');
-        return HttpResponse.json(`Hello, ${name || 'there'}! from ${baseURL}`);
+        const name = url.searchParams.get("name");
+        return HttpResponse.json(`Hello, ${name || "there"}! from ${baseURL}`);
       })
     );
   }

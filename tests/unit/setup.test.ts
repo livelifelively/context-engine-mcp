@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import apiResponses from '../fixtures/api-responses.json';
-import mcpRequests from '../fixtures/mcp-requests.json';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Load JSON fixtures
+const apiResponses = JSON.parse(readFileSync(join(__dirname, '../fixtures/api-responses.json'), 'utf8'));
+const mcpRequests = JSON.parse(readFileSync(join(__dirname, '../fixtures/mcp-requests.json'), 'utf8'));
 
 describe('Test Setup', () => {
   it('should have access to test fixtures', () => {
