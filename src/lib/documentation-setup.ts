@@ -265,6 +265,7 @@ export async function setupDocumentationStructure(projectRoot: string): Promise<
       error: error instanceof Error ? error.message : String(error),
     });
     const errorStatus = await checkDocumentationStructure(projectRoot);
+    
     return {
       success: false,
       message: `Failed to setup documentation structure: ${error}`,

@@ -146,9 +146,10 @@ export async function startContextEngine(
     logger.error("ContextEngine API call failed", {
       error: error instanceof Error ? error.message : String(error),
     });
+
     apiResponse = `⚠️  ContextEngine API call failed: ${error instanceof Error ? error.message : String(error)}`;
   }
-
+  
   // Return combined response
   return `${apiResponse}${documentationStatus}`;
 }
