@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { MCPTestUtils } from '../utils/mcp-test-utils.js';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { MCPTestUtils } from "../utils/mcp-test-utils.js";
 
-describe('MCP Server Integration', () => {
+describe("MCP Server Integration", () => {
   beforeAll(async () => {
     await MCPTestUtils.setupClient();
   });
@@ -10,23 +10,23 @@ describe('MCP Server Integration', () => {
     await MCPTestUtils.cleanupClient();
   });
 
-  it('should execute start_context_engine tool and return valid response', async () => {
-    if (MCPTestUtils.skipIfNotConnected('start_context_engine test')) return;
-    
+  it("should execute start_context_engine tool and return valid response", async () => {
+    if (MCPTestUtils.skipIfNotConnected("start_context_engine test")) return;
+
     // This test calls the local MCP server, which then calls the configured API
     // Flow: Test → MCP Client → Local MCP Server → API (local or remote)
-    const result = await MCPTestUtils.client.callTool({ 
-      name: 'start_context_engine', 
-      arguments: {} 
+    const result = await MCPTestUtils.client.callTool({
+      name: "start_context_engine",
+      arguments: {},
     });
-    
+
     const content = result.content as any[];
     const responseText = content[0].text;
-    console.log('MCP Tool Response:', responseText);
-    
+    console.log("MCP Tool Response:", responseText);
+
     // Test tool functionality - should return a valid response
     expect(responseText).toBeDefined();
-    expect(typeof responseText).toBe('string');
+    expect(typeof responseText).toBe("string");
     expect(responseText.length).toBeGreaterThan(0);
   });
 });

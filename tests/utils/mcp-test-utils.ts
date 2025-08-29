@@ -1,12 +1,12 @@
-import { expect } from 'vitest';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { join } from 'path';
-import { getTestConfig, shouldUseRealApi } from '../config/test-config.js';
+import { expect } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { join } from "path";
+import { getTestConfig, shouldUseRealApi } from "../config/test-config.js";
 
 /**
  * MCP Test Utilities for integration testing
- * 
+ *
  * Provides reusable utilities for MCP client setup, tool execution,
  * result validation, and error handling across test files.
  */
@@ -24,32 +24,35 @@ export class MCPTestUtils {
       return;
     }
 
-    this.client = new Client({
-      name: 'test-client',
-      version: '1.0.0',
-    }, {
-      capabilities: {
-        tools: {},
+    this.client = new Client(
+      {
+        name: "test-client",
+        version: "1.0.0",
       },
-    });
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     try {
-      const serverPath = join(process.cwd(), 'dist', 'index.js');
+      const serverPath = join(process.cwd(), "dist", "index.js");
       const transport = new StdioClientTransport({
-        command: 'node',
-        args: [serverPath, '--transport', 'stdio']
+        command: "node",
+        args: [serverPath, "--transport", "stdio"],
       });
-      
+
       // Add timeout to prevent hanging
       const connectPromise = this.client.connect(transport);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), 10000)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Connection timeout")), 10000)
       );
-      
+
       await Promise.race([connectPromise, timeoutPromise]);
       this.isConnected = true;
     } catch (error) {
-      console.log('Connection failed, this is expected with current setup:', error);
+      console.log("Connection failed, this is expected with current setup:", error);
       this.isConnected = false;
     }
   }
@@ -61,7 +64,7 @@ export class MCPTestUtils {
     if (this.client && this.isConnected) {
       try {
         await this.client.close();
-      } catch (error) {
+      } catch {
         // Ignore close errors
       }
     }
@@ -92,22 +95,22 @@ export class MCPTestUtils {
     const content = result.content as any[];
     expect(Array.isArray(content)).toBe(true);
     expect(content.length).toBeGreaterThan(0);
-    
+
     const firstContent = content[0] as any;
-    expect(firstContent.type).toBe('text');
-    expect(typeof firstContent.text).toBe('string');
-    
+    expect(firstContent.type).toBe("text");
+    expect(typeof firstContent.text).toBe("string");
+
     // Content validation
     if (expectedContent) {
       expect(firstContent.text).toContain(expectedContent);
     }
-    
+
     // Validate it's not an error message (for real API tests)
     if (shouldUseRealApi()) {
-      expect(firstContent.text).not.toContain('Failed to send greeting');
-      expect(firstContent.text).not.toContain('library you are trying to access does not exist');
+      expect(firstContent.text).not.toContain("Failed to send greeting");
+      expect(firstContent.text).not.toContain("library you are trying to access does not exist");
     }
-    
+
     return { content, firstContent };
   }
 
@@ -143,7 +146,7 @@ export class MCPTestUtils {
   static async expectToolError(name: string, args: any = {}) {
     try {
       await this.client.callTool({ name, arguments: args });
-      expect.fail('Should have thrown an error');
+      expect.fail("Should have thrown an error");
     } catch (error: any) {
       expect(error).toBeDefined();
       expect(error.message || error.code).toBeDefined();
@@ -156,23 +159,19 @@ export class MCPTestUtils {
    * @returns Configured StdioClientTransport instance
    */
   static createTransport() {
-    const serverPath = join(process.cwd(), 'dist', 'index.js');
-    const args = [
-      serverPath, 
-      '--transport', 'stdio',
-      '--server-url', this.config.apiBaseUrl
-    ];
+    const serverPath = join(process.cwd(), "dist", "index.js");
+    const args = [serverPath, "--transport", "stdio", "--server-url", this.config.apiBaseUrl];
 
     // Add API key if configured
     if (this.config.apiKey) {
-      args.push('--api-key', this.config.apiKey);
+      args.push("--api-key", this.config.apiKey);
     }
 
-    console.log(`MCP Test Utils: Starting server with args: ${args.join(' ')}`);
-    
+    console.log(`MCP Test Utils: Starting server with args: ${args.join(" ")}`);
+
     return new StdioClientTransport({
-      command: 'node',
-      args: args
+      command: "node",
+      args: args,
     });
   }
 
@@ -190,14 +189,14 @@ export class MCPTestUtils {
    */
   static async validateAvailableTools(expectedTools: string[]) {
     const tools = await this.getTools();
-    
+
     expect(tools).toBeDefined();
     expect(tools.tools).toBeDefined();
     expect(Array.isArray(tools.tools)).toBe(true);
     expect(tools.tools.length).toBeGreaterThan(0);
-    
+
     const toolNames = tools.tools.map((tool: any) => tool.name);
-    expectedTools.forEach(toolName => {
+    expectedTools.forEach((toolName) => {
       expect(toolNames).toContain(toolName);
     });
   }
@@ -209,15 +208,15 @@ export class MCPTestUtils {
   static async validateToolSchema(toolName: string) {
     const tools = await this.getTools();
     const tool = tools.tools.find((t: any) => t.name === toolName);
-    
+
     expect(tool).toBeDefined();
     if (tool) {
       expect(tool.name).toBeDefined();
       expect(tool.description).toBeDefined();
       expect(tool.inputSchema).toBeDefined();
-      expect(typeof tool.name).toBe('string');
-      expect(typeof tool.description).toBe('string');
-      expect(typeof tool.inputSchema).toBe('object');
+      expect(typeof tool.name).toBe("string");
+      expect(typeof tool.description).toBe("string");
+      expect(typeof tool.inputSchema).toBe("object");
     }
   }
 
@@ -232,13 +231,13 @@ export class MCPTestUtils {
         success: response.ok,
         status: response.status,
         statusText: response.statusText,
-        url: this.config.apiBaseUrl
+        url: this.config.apiBaseUrl,
       };
     } catch (error: any) {
       return {
         success: false,
         error: error.message,
-        url: this.config.apiBaseUrl
+        url: this.config.apiBaseUrl,
       };
     }
   }
@@ -251,7 +250,7 @@ export class MCPTestUtils {
   static validateErrorContent(error: any, expectedErrorPattern: string) {
     expect(error).toBeDefined();
     expect(error.message || error.code).toBeDefined();
-    
+
     if (error.message) {
       expect(error.message).toContain(expectedErrorPattern);
     }

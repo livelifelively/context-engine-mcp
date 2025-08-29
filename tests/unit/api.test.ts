@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { startContextEngine } from '../../src/lib/api.js';
-import apiResponses from '../fixtures/api-responses.json';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Load JSON fixtures
+const apiResponses = JSON.parse(readFileSync(join(__dirname, '../fixtures/api-responses.json'), 'utf8'));
 import { getTestConfig, shouldUseRealApi } from '../config/test-config.js';
 
 // Create a mock fetch function

@@ -11,7 +11,7 @@ export function getTestConfig(): TestConfig {
     apiBaseUrl: process.env.TEST_API_BASE_URL || 
                 process.env.CONTEXT_ENGINE_SERVER_URL || 
                 'https://contextengine.in',
-    testMode: (process.env.TEST_MODE as 'mock' | 'real' | 'integration') || 'real',
+    testMode: (process.env.TEST_MODE as 'mock' | 'real' | 'integration') || 'mock',
     timeout: parseInt(process.env.TEST_TIMEOUT || '10000'),
     apiKey: process.env.TEST_API_KEY,
     retries: parseInt(process.env.TEST_RETRIES || '3')

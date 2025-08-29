@@ -1,6 +1,6 @@
 /**
  * MCP-Compatible Logger
- * 
+ *
  * A logger specifically designed for MCP servers that:
  * - Writes all output to stderr to avoid breaking stdio protocol
  * - Provides different log levels
@@ -13,7 +13,7 @@ export enum LogLevel {
   WARN = 1,
   INFO = 2,
   DEBUG = 3,
-  TRACE = 4
+  TRACE = 4,
 }
 
 interface LogEntry {
@@ -30,10 +30,12 @@ class MCPLogger {
   constructor() {
     // Get log level from environment or default to INFO
     const envLevel = process.env.MCP_LOG_LEVEL?.toUpperCase();
-    this.level = envLevel ? LogLevel[envLevel as keyof typeof LogLevel] ?? LogLevel.INFO : LogLevel.INFO;
-    
+    this.level = envLevel
+      ? (LogLevel[envLevel as keyof typeof LogLevel] ?? LogLevel.INFO)
+      : LogLevel.INFO;
+
     // Enable structured logging if requested
-    this.isStructured = process.env.MCP_STRUCTURED_LOGS === 'true';
+    this.isStructured = process.env.MCP_STRUCTURED_LOGS === "true";
   }
 
   private shouldLog(level: LogLevel): boolean {
@@ -46,42 +48,47 @@ class MCPLogger {
         timestamp: new Date().toISOString(),
         level,
         message,
-        ...(context && { context })
+        ...(context && { context }),
       };
       return JSON.stringify(entry);
     }
-    
+
     const timestamp = new Date().toISOString();
-    const contextStr = context ? ` ${JSON.stringify(context)}` : '';
+    const contextStr = context ? ` ${JSON.stringify(context)}` : "";
     return `[${timestamp}] ${level.toUpperCase()}: ${message}${contextStr}`;
   }
 
-  private write(level: LogLevel, levelName: string, message: string, context?: Record<string, any>): void {
+  private write(
+    level: LogLevel,
+    levelName: string,
+    message: string,
+    context?: Record<string, any>
+  ): void {
     if (!this.shouldLog(level)) return;
-    
+
     const formatted = this.formatMessage(levelName, message, context);
     // Always write to stderr to avoid breaking MCP stdio protocol
-    process.stderr.write(formatted + '\n');
+    process.stderr.write(formatted + "\n");
   }
 
   error(message: string, context?: Record<string, any>): void {
-    this.write(LogLevel.ERROR, 'error', message, context);
+    this.write(LogLevel.ERROR, "error", message, context);
   }
 
   warn(message: string, context?: Record<string, any>): void {
-    this.write(LogLevel.WARN, 'warn', message, context);
+    this.write(LogLevel.WARN, "warn", message, context);
   }
 
   info(message: string, context?: Record<string, any>): void {
-    this.write(LogLevel.INFO, 'info', message, context);
+    this.write(LogLevel.INFO, "info", message, context);
   }
 
   debug(message: string, context?: Record<string, any>): void {
-    this.write(LogLevel.DEBUG, 'debug', message, context);
+    this.write(LogLevel.DEBUG, "debug", message, context);
   }
 
   trace(message: string, context?: Record<string, any>): void {
-    this.write(LogLevel.TRACE, 'trace', message, context);
+    this.write(LogLevel.TRACE, "trace", message, context);
   }
 
   // Convenience method for API-related logging
