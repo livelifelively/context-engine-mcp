@@ -87,6 +87,17 @@ else
 fi
 
 echo ""
+echo "🔨 Building project first..."
+if npm run build > /dev/null 2>&1; then
+    print_status "PASS" "Build successful for testing"
+else
+    print_status "FAIL" "Build failed"
+    echo "Running build with full output:"
+    npm run build
+    exit 1
+fi
+
+echo ""
 echo "🧪 Running tests..."
 if npm run test:run > /dev/null 2>&1; then
     print_status "PASS" "All tests passed"
@@ -97,16 +108,7 @@ else
     exit 1
 fi
 
-echo ""
-echo "🔨 Building project..."
-if npm run build > /dev/null 2>&1; then
-    print_status "PASS" "Build successful"
-else
-    print_status "FAIL" "Build failed"
-    echo "Running build with full output:"
-    npm run build
-    exit 1
-fi
+
 
 # Verify build output exists
 if [ ! -d "dist" ]; then
