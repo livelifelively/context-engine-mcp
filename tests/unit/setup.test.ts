@@ -1,6 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Load JSON fixtures
+const apiResponses = JSON.parse(readFileSync(join(__dirname, "../fixtures/api-responses.json"), "utf8"));
+const mcpRequests = JSON.parse(readFileSync(join(__dirname, "../fixtures/mcp-requests.json"), "utf8"));
+
 
 // Load JSON fixtures
 const apiResponses = JSON.parse(

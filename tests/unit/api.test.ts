@@ -9,6 +9,7 @@ const apiResponses = JSON.parse(
 );
 import { getTestConfig, shouldUseRealApi } from "../config/test-config.js";
 
+
 // Create a mock fetch function
 const mockFetch = vi.fn();
 
